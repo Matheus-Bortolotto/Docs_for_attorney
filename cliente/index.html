@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Envio de Documentos — Docs for attorney</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --bg:#f4f3f0; --surface:#fff; --border:#e5e3df; --text:#1a1917;
+    --text2:#6b6860; --text3:#9c9a95; --accent:#1a6b4a; --accent-light:#e8f5ef;
+    --amber:#d97706; --amber-light:#fffbeb; --red:#c0392b; --red-light:#fdf0ee;
+    --blue:#2563eb; --blue-light:#eff6ff;
+    --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
+    --radius:12px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.5; min-height:100vh; }
+
+  /* HEADER */
+  .portal-header { background:var(--text); padding:24px 32px 28px; color:#fff; }
+  .portal-logo { display:flex; align-items:center; gap:10px; margin-bottom:20px; opacity:0.6; font-size:12px; }
+  .portal-logo-icon { width:24px; height:24px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .portal-name { font-size:24px; font-weight:700; }
+  .portal-action-badge { display:inline-block; margin-top:6px; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); padding:3px 12px; border-radius:20px; font-size:11px; font-weight:500; }
+  .portal-progress { margin-top:18px; display:flex; align-items:center; gap:12px; }
+  .portal-prog-bar { flex:1; height:6px; background:rgba(255,255,255,0.15); border-radius:3px; overflow:hidden; }
+  .portal-prog-fill { height:100%; background:#4ade80; border-radius:3px; transition:width 0.5s; }
+  .portal-prog-label { font-size:12px; color:rgba(255,255,255,0.6); white-space:nowrap; }
+
+  /* BODY */
+  .portal-body { max-width:680px; margin:0 auto; padding:28px 24px; }
+
+  /* LGPD */
+  .lgpd-card { background:var(--amber-light); border:1px solid #fde68a; border-radius:var(--radius); padding:20px; margin-bottom:24px; }
+  .lgpd-card h3 { font-size:14px; font-weight:700; margin-bottom:6px; }
+  .lgpd-card p { font-size:13px; color:var(--text2); margin-bottom:14px; line-height:1.6; }
+
+  /* CATEGORIA */
+  .cat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text3); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .cat-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .cat-group { margin-bottom:24px; }
+
+  /* DOC CARD */
+  .doc-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:8px; box-shadow:var(--shadow); transition:all 0.2s; }
+  .doc-card.uploaded { border-color:#a7f3d0; background:var(--accent-light); }
+  .doc-card.naotem   { border-color:#fde68a; background:var(--amber-light); }
+  .doc-card.uploading{ border-color:#bfdbfe; background:var(--blue-light); }
+
+  .doc-header { display:flex; align-items:flex-start; gap:12px; }
+  .doc-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
+  .doc-info { flex:1; }
+  .doc-name { font-size:13px; font-weight:700; }
+  .doc-hint { font-size:12px; color:var(--text2); margin-top:3px; line-height:1.5; }
+  .doc-obrig { font-size:10px; color:var(--red); font-weight:600; margin-top:3px; }
+
+  .doc-actions { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+  .btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:none; font-family:inherit; transition:all 0.15s; display:inline-flex; align-items:center; gap:5px; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:#155a3d; }
+  .btn-amber { background:var(--amber-light); color:var(--amber); border:1px solid #fde68a; }
+  .btn-done { background:var(--accent-light); color:var(--accent); border:1px solid #a7f3d0; }
+  .btn-ghost { background:var(--surface); color:var(--text2); border:1px solid var(--border); }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+  /* UPLOAD PROGRESS */
+  .upload-prog { margin-top:8px; }
+  .upload-prog-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .upload-prog-fill { height:100%; background:var(--accent); border-radius:2px; transition:width 0.3s; }
+  .upload-prog-label { font-size:10px; color:var(--text3); margin-top:3px; }
+
+  /* NAOTEM FORM */
+  .naotem-form { margin-top:12px; padding:12px; border-radius:8px; background:rgba(217,119,6,0.06); border:1px solid #fde68a; display:none; }
+  .naotem-form.open { display:block; }
+  .naotem-form p { font-size:12px; color:var(--amber); font-weight:600; margin-bottom:8px; }
+  .naotem-form textarea { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #fde68a; background:#fff; font-family:inherit; font-size:12px; color:var(--text); outline:none; resize:vertical; min-height:60px; }
+  .naotem-form .btn { margin-top:8px; background:var(--amber); color:#fff; }
+
+  /* DRIVE LINK */
+  .drive-link { font-size:11px; color:var(--blue); display:inline-flex; align-items:center; gap:3px; margin-top:5px; text-decoration:none; }
+  .drive-link:hover { text-decoration:underline; }
+
+  /* FOOTER */
+  .portal-footer { text-align:center; padding:32px 24px; color:var(--text3); font-size:11px; border-top:1px solid var(--border); margin-top:24px; }
+
+  /* LOADING / NOT FOUND */
+  .center-msg { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; gap:16px; color:var(--text3); }
+  .center-msg .icon { font-size:48px; }
+  .center-msg h2 { font-size:18px; font-weight:700; color:var(--text); }
+  .center-msg p { font-size:13px; max-width:300px; text-align:center; line-height:1.6; }
+
+  /* CONCLUIDO */
+  .success-banner { background:#f0fdf4; border:1px solid #a7f3d0; border-radius:var(--radius); padding:20px; text-align:center; margin-bottom:24px; }
+  .success-banner .icon { font-size:32px; }
+  .success-banner h3 { font-size:16px; font-weight:700; margin-top:8px; color:var(--accent); }
+  .success-banner p { font-size:13px; color:var(--text2); margin-top:4px; }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:#d0cec9; border-radius:2px; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DADOS — espelha o mesmo actionTemplates do admin
+// ═══════════════════════════════════════════════════════════
+const actionTemplates = {
+  superendividamento: { nome:"Superendividamento", documentos:[
+    { categoria:"Documentos pessoais", itens:[
+      { id:"rg-cnh", nome:"RG ou CNH", comoObter:"Foto nítida frente e verso ou PDF digitalizado.", obrigatorio:true },
+      { id:"cpf", nome:"CPF", comoObter:"Cartão do CPF, print do gov.br ou documento com número visível.", obrigatorio:true },
+      { id:"residencia", nome:"Comprovante de residência", comoObter:"Conta de água, luz ou gás dos últimos 90 dias.", obrigatorio:true },
+    ]},
+    { categoria:"Renda e extratos", itens:[
+      { id:"holerites", nome:"3 últimos comprovantes de renda", comoObter:"Baixar no portal do RH, app da empresa ou solicitar ao setor pessoal.", obrigatorio:true },
+      { id:"extratos-contas", nome:"Extratos de todas as contas ativas", comoObter:"Baixar em PDF com movimentação completa dos últimos 3 meses.", obrigatorio:true },
+      { id:"faturas", nome:"3 últimas faturas de todos os cartões", comoObter:"Baixar no app do banco ou cartão.", obrigatorio:true },
+    ]},
+    { categoria:"Complementares", itens:[
+      { id:"registrato", nome:"Relatório Registrato atualizado", comoObter:"Emitir gratuitamente no site do Banco Central usando gov.br.", obrigatorio:true },
+      { id:"contratos-boletos", nome:"Contratos, boletos e carnês", comoObter:"Enviar qualquer documento que mostre valor, parcelas ou taxas.", obrigatorio:false },
+    ]},
+  ]},
+  revisaoDividas: { nome:"Revisão de dívidas", documentos:[
+    { categoria:"Contratos", itens:[
+      { id:"contrato-principal", nome:"Contrato principal da dívida", comoObter:"Solicitar ao banco ou baixar no site/aplicativo.", obrigatorio:true },
+      { id:"aditivos", nome:"Aditivos ou renegociações", comoObter:"Enviar todo termo novo assinado posteriormente.", obrigatorio:false },
+    ]},
+    { categoria:"Pagamentos", itens:[
+      { id:"parcelas-pagas", nome:"Comprovantes de parcelas pagas", comoObter:"Comprovantes bancários, recibos ou histórico do app.", obrigatorio:true },
+      { id:"extratos-base", nome:"Extratos bancários do período", comoObter:"Período desde a contratação até hoje.", obrigatorio:true },
+    ]},
+  ]},
+  execucao: { nome:"Execução de dívida", documentos:[
+    { categoria:"Base da execução", itens:[
+      { id:"contrato-execucao", nome:"Contrato que originou a dívida", comoObter:"Solicitar ao credor ou baixar no portal/app.", obrigatorio:true },
+      { id:"planilha-execucao", nome:"Planilha de cálculo atualizada", comoObter:"Enviar planilha recebida no processo ou cobrança.", obrigatorio:true },
+      { id:"citacao-intimacao", nome:"Citação ou intimação recebida", comoObter:"PDF, foto nítida ou print completo.", obrigatorio:true },
+    ]},
+    { categoria:"Documentos pessoais", itens:[
+      { id:"documentos-pessoais-execucao", nome:"RG, CPF e comprovante de residência", comoObter:"Documentos legíveis e atualizados.", obrigatorio:true },
+    ]},
+  ]},
+  apreensao: { nome:"Busca e apreensão", documentos:[
+    { categoria:"Financiamento", itens:[
+      { id:"contrato-financiamento", nome:"Contrato de financiamento", comoObter:"Solicitar ao banco ou baixar no portal/app.", obrigatorio:true },
+      { id:"parcelas-financiamento", nome:"Comprovantes das parcelas pagas", comoObter:"Histórico do banco, recibos ou extratos.", obrigatorio:true },
+      { id:"notificacoes-apreensao", nome:"Notificações de cobrança e atraso", comoObter:"E-mails, cartas, SMS, WhatsApp e notificações extrajudiciais.", obrigatorio:true },
+    ]},
+    { categoria:"Bem e processo", itens:[
+      { id:"documento-bem", nome:"Documento do veículo (CRLV)", comoObter:"CRLV digital ou físico legível.", obrigatorio:true },
+      { id:"decisoes-apreensao", nome:"Mandado ou decisão judicial", comoObter:"PDF do processo ou print do andamento.", obrigatorio:true },
+    ]},
+  ]},
+  penhora: { nome:"Penhora de bens", documentos:[
+    { categoria:"Processo", itens:[
+      { id:"mandado-penhora", nome:"Mandado ou decisão de penhora", comoObter:"PDF do processo ou intimação recebida.", obrigatorio:true },
+    ]},
+    { categoria:"Bem", itens:[
+      { id:"registro-imovel", nome:"Matrícula ou registro do imóvel", comoObter:"Solicitar no cartório de registro de imóveis.", obrigatorio:false },
+      { id:"comprovantes-propriedade", nome:"Comprovantes de propriedade ou posse", comoObter:"Notas fiscais, contratos, certidões e equivalentes.", obrigatorio:true },
+    ]},
+  ]},
+  exigencia: { nome:"Cumprimento de exigência", documentos:[
+    { categoria:"Exigência", itens:[
+      { id:"despacho-exigencia", nome:"Despacho, intimação ou exigência recebida", comoObter:"Enviar o documento que indica a exigência.", obrigatorio:true },
+      { id:"documento-solicitado-1", nome:"Documento solicitado pela equipe ou juízo", comoObter:"Anexar o arquivo específico pedido nesta etapa.", obrigatorio:true },
+    ]},
+  ]},
+  renegociacao: { nome:"Renegociação extrajudicial", documentos:[
+    { categoria:"Negociação", itens:[
+      { id:"propostas-recebidas", nome:"Propostas recebidas", comoObter:"Prints, PDFs, e-mails ou mensagens.", obrigatorio:true },
+      { id:"renda-renegociacao", nome:"Comprovantes de renda", comoObter:"Holerite, extrato bancário, benefício ou equivalente.", obrigatorio:true },
+    ]},
+  ]},
+};
+
+// ═══════════════════════════════════════════════════════════
+// CLIENTES DE DEMO (mesmos dados do admin)
+// Em produção isso viria de um banco de dados
+// ═══════════════════════════════════════════════════════════
+const demoClients = {
+  'cli-1048': { id:'CLI-1048', nome:'Maria Aparecida', acao:'execucao',  enviados:['citacao-intimacao','documentos-pessoais-execucao'], consentimento:false },
+  'cli-1082': { id:'CLI-1082', nome:'José Carlos',     acao:'apreensao', enviados:['contrato-financiamento','parcelas-financiamento','documento-bem'], consentimento:true },
+  'cli-1091': { id:'CLI-1091', nome:'Valeska Santos',  acao:'superendividamento', enviados:[], consentimento:false },
+  'cli-1107': { id:'CLI-1107', nome:'Roberto Souza',   acao:'penhora',   enviados:['mandado-penhora','comprovantes-propriedade','registro-imovel'], consentimento:true },
+  'cli-1115': { id:'CLI-1115', nome:'Ana Beatriz Lima',acao:'revisaoDividas', enviados:['parcelas-pagas'], consentimento:true },
+  'demo':     { id:'DEMO',     nome:'Cliente Demo',    acao:'superendividamento', enviados:[], consentimento:false },
+};
+
+// ═══════════════════════════════════════════════════════════
+// LÊ CLIENTE DA URL
+// URL: /cliente/cli-1048  ou  /cliente/demo
+// ═══════════════════════════════════════════════════════════
+function getClientFromURL() {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  // parts = ['cliente', 'cli-1048-maria-aparecida'] ou ['cliente','demo']
+  const slug = parts[1] || 'demo';
+  // Tenta encontrar pelo ID (primeiros chars antes do segundo -)
+  // Ex: cli-1048-maria-aparecida → cli-1048
+  const idMatch = slug.match(/^(cli-\d+)/i);
+  const key = idMatch ? idMatch[1].toLowerCase() : slug.toLowerCase();
+  return demoClients[key] || demoClients['demo'];
+}
+
+// ═══════════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════════
+const client  = getClientFromURL();
+const template = actionTemplates[client.acao];
+const docState = {}; // docId → 'uploaded' | 'naotem' | 'uploading'
+let consentOk  = client.consentimento;
+
+function allDocs() {
+  return template.documentos.flatMap(g => g.itens.map(i => ({...i, categoria:g.categoria})));
+}
+function countDone() {
+  return allDocs().filter(d => client.enviados.includes(d.id) || docState[d.id]==='uploaded').length;
+}
+function pct() {
+  const total = allDocs().length;
+  return total ? Math.round(countDone()/total*100) : 0;
+}
+function allDone() { return countDone() === allDocs().length; }
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+function render() {
+  const done = countDone();
+  const total = allDocs().length;
+  const p = pct();
+
+  document.getElementById('root').innerHTML = `
+    <div class="portal-header">
+      <div class="portal-logo">
+        <div class="portal-logo-icon">⚖️</div>
+        <span>Docs for attorney — Portal Documental</span>
+      </div>
+      <div class="portal-name">Olá, ${client.nome}!</div>
+      <span class="portal-action-badge">${template.nome}</span>
+      <div class="portal-progress">
+        <div class="portal-prog-bar"><div class="portal-prog-fill" style="width:${p}%"></div></div>
+        <span class="portal-prog-label">${done} de ${total} enviados</span>
+      </div>
+    </div>
+
+    <div class="portal-body">
+
+      ${allDone() ? `
+        <div class="success-banner">
+          <div class="icon">🎉</div>
+          <h3>Documentação completa!</h3>
+          <p>Tudo foi enviado com sucesso. Nossa equipe irá conferir e entrará em contato em breve.</p>
+        </div>` : ''}
+
+      ${!consentOk ? `
+        <div class="lgpd-card">
+          <h3>📋 Autorização LGPD necessária</h3>
+          <p>Para prosseguir com o envio de documentos, confirme que autoriza o tratamento dos seus dados pela equipe jurídica conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).</p>
+          <button class="btn btn-primary" onclick="confirmConsent()">✅ Autorizar e continuar</button>
+        </div>` : ''}
+
+      ${template.documentos.map(group => `
+        <div class="cat-group">
+          <div class="cat-label">${group.categoria}</div>
+          ${group.itens.map(doc => renderDoc(doc, group.categoria)).join('')}
+        </div>`).join('')}
+
+      <div class="portal-footer">
+        🔒 Seus dados são protegidos conforme a LGPD<br>
+        Envios registrados com segurança • Docs for attorney
+      </div>
+    </div>
+  `;
+}
+
+function renderDoc(doc, categoria) {
+  const already   = client.enviados.includes(doc.id);
+  const state     = docState[doc.id];
+  const isUploaded = already || state === 'uploaded';
+  const isNaotem   = state === 'naotem';
+  const isUploading= state === 'uploading';
+  const driveUrl   = docState[doc.id + '_url'];
+  const fileName   = docState[doc.id + '_name'];
+  const disabled   = !consentOk ? 'disabled' : '';
+
+  const icon = isUploaded ? '✅' : isNaotem ? '📝' : isUploading ? '⏳' : '📄';
+  const cls  = isUploaded ? 'uploaded' : isNaotem ? 'naotem' : isUploading ? 'uploading' : '';
+
+  return `
+    <div class="doc-card ${cls}" id="doc-${doc.id}">
+      <div class="doc-header">
+        <div class="doc-icon">${icon}</div>
+        <div class="doc-info">
+          <div class="doc-name">${doc.nome}${doc.obrigatorio ? ' <span style="color:var(--red);font-size:10px;font-weight:600;">* obrigatório</span>' : ''}</div>
+          <div class="doc-hint">💡 ${doc.comoObter}</div>
+          ${driveUrl ? `<a href="${driveUrl}" target="_blank" class="drive-link">📁 Ver no Drive — ${fileName||'arquivo'}</a>` : ''}
+        </div>
+      </div>
+
+      <input type="file" id="file-${doc.id}" accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+        onchange="handleFile(event,'${doc.id}','${doc.nome}','${categoria}')">
+
+      <div class="doc-actions">
+        ${isUploaded ? `
+          <span class="btn btn-done">✅ Enviado com sucesso</span>
+          <button class="btn btn-ghost" onclick="undoDoc('${doc.id}')">↩️ Desfazer</button>
+        ` : isNaotem ? `
+          <span class="btn btn-amber">📝 Declaração registrada</span>
+          <button class="btn btn-ghost" onclick="undoDoc('${doc.id}')">↩️ Voltar</button>
+        ` : isUploading ? `
+          <span style="font-size:12px;color:var(--blue);font-weight:600;">⏳ Enviando...</span>
+        ` : `
+          <button class="btn btn-primary" ${disabled} onclick="document.getElementById('file-${doc.id}').click()">📎 Selecionar arquivo</button>
+          <button class="btn btn-amber" ${disabled} onclick="toggleNaotem('${doc.id}')">❌ Não tenho este doc</button>
+        `}
+      </div>
+
+      ${isUploading ? `
+        <div class="upload-prog" id="prog-${doc.id}">
+          <div class="upload-prog-bar"><div class="upload-prog-fill" style="width:0%" id="prog-fill-${doc.id}"></div></div>
+          <div class="upload-prog-label" id="prog-label-${doc.id}">Preparando envio...</div>
+        </div>` : ''}
+
+      <div class="naotem-form" id="naotem-form-${doc.id}">
+        <p>Descreva brevemente o motivo de não possuir este documento:</p>
+        <textarea placeholder="Ex: Não possuo veículo registrado em meu nome..." id="naotem-text-${doc.id}"></textarea>
+        <button class="btn" onclick="confirmNaotem('${doc.id}')">✅ Confirmar declaração</button>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// AÇÕES
+// ═══════════════════════════════════════════════════════════
+function confirmConsent() {
+  consentOk = true;
+  render();
+}
+
+async function handleFile(event, docId, docName, categoria) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Validação
+  const allowed = ['application/pdf','image/jpeg','image/jpg','image/png'];
+  if (!allowed.includes(file.type)) { alert('Formato inválido. Use PDF, JPG ou PNG.'); return; }
+  if (file.size > 20*1024*1024) { alert(`Arquivo muito grande (${(file.size/1024/1024).toFixed(1)}MB). Máximo: 20MB.`); return; }
+
+  // Simula upload (em produção: chamada real pro Drive ou S3)
+  docState[docId] = 'uploading';
+  render();
+
+  // Progresso animado
+  let p = 0;
+  const iv = setInterval(() => {
+    p = Math.min(p + Math.random()*25, 90);
+    const fill  = document.getElementById('prog-fill-'+docId);
+    const label = document.getElementById('prog-label-'+docId);
+    if (fill)  fill.style.width  = p + '%';
+    if (label) label.textContent = `Enviando... ${Math.round(p)}%`;
+  }, 250);
+
+  await new Promise(r => setTimeout(r, 1800));
+  clearInterval(iv);
+
+  docState[docId]         = 'uploaded';
+  docState[docId+'_name'] = file.name;
+  // Em produção: docState[docId+'_url'] = resultado.driveUrl;
+
+  render();
+}
+
+function toggleNaotem(docId) {
+  const f = document.getElementById('naotem-form-'+docId);
+  if (f) f.classList.toggle('open');
+}
+
+function confirmNaotem(docId) {
+  docState[docId] = 'naotem';
+  render();
+}
+
+function undoDoc(docId) {
+  delete docState[docId];
+  delete docState[docId+'_url'];
+  delete docState[docId+'_name'];
+  // Remove dos enviados de demo também se estava lá
+  client.enviados = client.enviados.filter(d => d !== docId);
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>

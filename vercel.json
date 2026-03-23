@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    { "source": "/admin",            "destination": "/admin/index.html" },
+    { "source": "/admin/(.*)",       "destination": "/admin/index.html" },
+    { "source": "/cliente",          "destination": "/cliente/index.html" },
+    { "source": "/cliente/(.*)",     "destination": "/cliente/index.html" },
+    { "source": "/",                 "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Cache-Control",          "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ]
+}

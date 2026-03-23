@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docs for attorney — Portal Documental</title>
+
+<!-- Google API -->
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f4f3f0;
+    --surface: #ffffff;
+    --surface2: #f9f8f6;
+    --border: #e5e3df;
+    --border2: #d0cec9;
+    --text: #1a1917;
+    --text2: #6b6860;
+    --text3: #9c9a95;
+    --accent: #1a6b4a;
+    --accent-light: #e8f5ef;
+    --red: #c0392b;
+    --red-light: #fdf0ee;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; min-width: 240px; background: var(--text); display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .logo-mark { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .logo-text { color: #fff; font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
+  .logo-sub { color: rgba(255,255,255,0.4); font-size: 10px; margin-top: 1px; }
+  .sidebar-section { padding: 16px 12px 8px; }
+  .sidebar-section-label { font-size: 9px; font-weight: 600; letter-spacing: 1.2px; color: rgba(255,255,255,0.3); text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #fff; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 1px 6px; min-width: 18px; text-align: center; }
+  .nav-badge.amber { background: var(--amber); }
+  .sidebar-footer { margin-top: auto; padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: rgba(255,255,255,0.6); font-size: 12px; cursor: pointer; }
+  .user-pill:hover { background: rgba(255,255,255,0.07); }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+
+  /* DRIVE STATUS BAR */
+  .drive-bar { background: #1e3a2e; padding: 8px 24px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: rgba(255,255,255,0.7); flex-shrink: 0; }
+  .drive-bar .drive-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
+  .drive-bar .drive-dot.connected { background: #4ade80; }
+  .drive-bar a { color: #4ade80; text-decoration: underline; cursor: pointer; margin-left: auto; font-weight: 600; font-size: 11px; }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .topbar-title { font-size: 15px; font-weight: 700; flex: 1; }
+  .topbar-search { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; width: 240px; }
+  .topbar-search input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); outline: none; width: 100%; }
+  .topbar-search input::placeholder { color: var(--text3); }
+  .topbar-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
+  .topbar-btn.primary { background: var(--accent); color: #fff; }
+  .topbar-btn.primary:hover { background: #155a3d; }
+  .topbar-btn.ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+  .topbar-btn.ghost:hover { background: var(--bg); }
+
+  /* VIEWS */
+  .view { flex: 1; overflow-y: auto; }
+  .view-panel { display: none; height: 100%; }
+  .view-panel.active { display: flex; flex-direction: column; }
+  .panel-body { padding: 24px; flex: 1; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border-radius: var(--radius); padding: 16px 18px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .stat-label { font-size: 11px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; }
+  .stat-value { font-size: 26px; font-weight: 700; margin-top: 6px; line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* TABLE */
+  .list-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .list-header h2 { font-size: 14px; font-weight: 700; flex: 1; }
+  .filter-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text2); transition: all 0.15s; }
+  .filter-pill.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .client-table { width: 100%; border-collapse: collapse; }
+  .client-table th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .client-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .client-table tr { cursor: pointer; transition: background 0.12s; }
+  .client-table tr:hover td { background: var(--surface2); }
+  .client-table tr.selected td { background: var(--accent-light); }
+  .name-cell { display: flex; align-items: center; gap: 10px; }
+  .name-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .name-main { font-weight: 600; font-size: 13px; }
+  .name-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.green { background: var(--accent-light); color: var(--accent); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); }
+  .badge.red { background: var(--red-light); color: var(--red); }
+  .badge.blue { background: var(--blue-light); color: var(--blue); }
+  .badge.purple { background: var(--purple-light); color: var(--purple); }
+  .badge.gray { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .progress-bar { height: 6px; background: var(--bg); border-radius: 3px; width: 80px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+  /* DETAIL */
+  .detail-layout { display: flex; flex: 1; overflow: hidden; height: 100%; }
+  .detail-list { width: 280px; min-width: 280px; border-right: 1px solid var(--border); overflow-y: auto; background: var(--surface); }
+  .detail-main { flex: 1; overflow-y: auto; padding: 24px; background: var(--bg); }
+  .dlist-header { padding: 16px; border-bottom: 1px solid var(--border); }
+  .dlist-search { display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; margin-top: 10px; }
+  .dlist-search input { border: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text); outline: none; flex: 1; }
+  .client-item { padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
+  .client-item:hover { background: var(--surface2); }
+  .client-item.active { background: var(--accent-light); border-left: 3px solid var(--accent); }
+  .client-item .ci-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  .client-item .ci-row { display: flex; align-items: center; justify-content: space-between; }
+  .client-item .ci-type { font-size: 11px; color: var(--text3); }
+  .detail-header { background: var(--surface); border-radius: var(--radius); padding: 20px 24px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 16px; }
+  .detail-header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .detail-name { font-size: 20px; font-weight: 700; }
+  .detail-meta { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+  .detail-meta-item { font-size: 12px; color: var(--text2); }
+  .action-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .action-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
+  .action-btn.primary { background: var(--accent); color: #fff; }
+  .action-btn.primary:hover { background: #155a3d; }
+  .action-btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .action-btn.secondary:hover { background: var(--bg); }
+  .action-btn.amber-btn { background: var(--amber-light); color: var(--amber); border: 1px solid #fde68a; }
+  .action-btn.red-btn { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
+  .action-btn.blue-btn { background: var(--blue-light); color: var(--blue); border: 1px solid #bfdbfe; }
+  .tabs-bar { display: flex; gap: 2px; background: var(--surface); border-radius: var(--radius); padding: 4px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow); }
+  .tab-btn { flex: 1; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text2); transition: all 0.15s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .tab-btn.active { background: var(--text); color: #fff; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .card { background: var(--surface); border-radius: var(--radius); padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+  .form-select, .form-input, .form-textarea { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); font-family: inherit; font-size: 13px; color: var(--text); outline: none; transition: border 0.15s; }
+  .form-select:focus, .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  /* DOC ITEMS */
+  .doc-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; transition: all 0.2s; }
+  .doc-item.sent { background: var(--accent-light); border-color: #a7f3d0; }
+  .doc-item.pending { background: var(--surface); }
+  .doc-item.invalid { background: var(--red-light); border-color: #fecaca; }
+  .doc-status-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .doc-name { font-size: 13px; font-weight: 600; }
+  .doc-cat { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .doc-action { margin-left: auto; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; flex-shrink: 0; }
+  .doc-action.mark-ok { background: var(--accent-light); color: var(--accent); }
+  .doc-action.mark-invalid { background: var(--red-light); color: var(--red); }
+  .doc-action.request { background: var(--amber-light); color: var(--amber); }
+  .doc-drive-link { font-size: 10px; color: var(--blue); text-decoration: none; display: flex; align-items: center; gap: 3px; margin-top: 4px; }
+  .doc-drive-link:hover { text-decoration: underline; }
+
+  /* UPLOAD PROGRESS */
+  .upload-progress { margin-top: 6px; }
+  .upload-progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .upload-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+  .upload-progress-label { font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+  .link-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); word-break: break-all; margin-bottom: 10px; }
+  .obs-item { padding: 10px 12px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+  .obs-meta { font-size: 10px; color: var(--text3); margin-top: 4px; }
+  .hist-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .hist-time { font-family: 'DM Mono', monospace; color: var(--text3); white-space: nowrap; }
+  .hist-desc { color: var(--text2); }
+  .whatsapp-box { background: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 8px; padding: 12px; font-size: 12px; color: #1a4731; line-height: 1.6; white-space: pre-wrap; font-family: inherit; margin-bottom: 10px; word-break: break-word; }
+
+  /* PORTAL CLIENTE */
+  .portal-view { flex: 1; overflow-y: auto; background: var(--bg); }
+  .portal-header { background: var(--text); padding: 20px 32px 24px; color: #fff; }
+  .portal-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; opacity: 0.7; font-size: 12px; }
+  .portal-name { font-size: 22px; font-weight: 700; }
+  .portal-action-badge { display: inline-block; margin-top: 6px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .portal-progress { margin-top: 16px; display: flex; align-items: center; gap: 12px; }
+  .portal-prog-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
+  .portal-prog-fill { height: 100%; background: #4ade80; border-radius: 3px; transition: width 0.5s; }
+  .portal-prog-label { font-size: 12px; color: rgba(255,255,255,0.6); white-space: nowrap; }
+  .portal-body { padding: 24px 32px; max-width: 700px; margin: 0 auto; }
+  .portal-cat { margin-bottom: 24px; }
+  .portal-cat-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .portal-cat-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .portal-doc { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; margin-bottom: 8px; box-shadow: var(--shadow); }
+  .portal-doc.uploaded { border-color: #a7f3d0; background: var(--accent-light); }
+  .portal-doc.naotem { border-color: #fde68a; background: var(--amber-light); }
+  .portal-doc.uploading { border-color: #bfdbfe; background: var(--blue-light); }
+  .portal-doc-header { display: flex; align-items: flex-start; gap: 10px; }
+  .portal-doc-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .portal-doc-info { flex: 1; }
+  .portal-doc-name { font-size: 13px; font-weight: 700; }
+  .portal-doc-hint { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.5; }
+  .portal-doc-obrig { font-size: 10px; color: var(--red); font-weight: 600; margin-top: 4px; }
+  .portal-doc-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .portal-action-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+  .portal-action-btn.upload { background: var(--accent); color: #fff; }
+  .portal-action-btn.upload:hover { background: #155a3d; }
+  .portal-action-btn.naotem-btn { background: var(--amber-light); color: var(--amber); border: 1px solid #fde68a; }
+  .portal-action-btn.done-btn { background: var(--accent-light); color: var(--accent); border: 1px solid #a7f3d0; }
+  .portal-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .portal-naotem-form { margin-top: 12px; padding: 12px; border-radius: 8px; background: rgba(217,119,6,0.06); border: 1px solid #fde68a; display: none; }
+  .portal-naotem-form.open { display: block; }
+  .portal-naotem-form p { font-size: 12px; color: var(--amber); font-weight: 600; margin-bottom: 8px; }
+  .portal-naotem-form textarea { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #fde68a; background: #fff; font-family: inherit; font-size: 12px; color: var(--text); outline: none; resize: vertical; min-height: 60px; }
+  .portal-naotem-form button { margin-top: 8px; padding: 7px 14px; border-radius: 8px; background: var(--amber); color: #fff; border: none; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .portal-footer { text-align: center; padding: 24px; color: var(--text3); font-size: 11px; border-top: 1px solid var(--border); margin-top: 24px; }
+
+  /* FILE SIZE FEEDBACK */
+  .file-feedback { font-size: 11px; margin-top: 4px; }
+  .file-feedback.ok { color: var(--accent); }
+  .file-feedback.erro { color: var(--red); }
+
+  /* DRIVE SETUP CARD */
+  .drive-setup { background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+  .drive-setup h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .drive-setup p { font-size: 12px; color: var(--text2); margin-bottom: 12px; line-height: 1.6; }
+  .drive-setup input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #fff; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); outline: none; margin-bottom: 8px; }
+  .drive-setup input:focus { border-color: var(--accent); }
+
+  /* KOMMO SETUP CARD */
+  .kommo-setup { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+  .kommo-setup h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--blue); }
+  .kommo-setup p { font-size: 12px; color: var(--text2); margin-bottom: 12px; line-height: 1.6; }
+  .kommo-setup input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #bfdbfe; background: #fff; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); outline: none; margin-bottom: 8px; }
+  .kommo-setup input:focus { border-color: var(--blue); }
+
+  /* WEBHOOK LOG */
+  .webhook-log { background: #0f172a; border-radius: var(--radius); padding: 16px; margin-top: 12px; max-height: 200px; overflow-y: auto; }
+  .webhook-log-title { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .webhook-log-item { font-family: 'DM Mono', monospace; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #1e293b; display: flex; gap: 8px; }
+  .webhook-log-time { color: #64748b; flex-shrink: 0; }
+  .webhook-log-event { color: #4ade80; flex-shrink: 0; }
+  .webhook-log-msg { color: #94a3b8; }
+  .webhook-log-item.error .webhook-log-event { color: #f87171; }
+  .webhook-log-item.warn .webhook-log-event { color: #fbbf24; }
+
+  /* KOMMO STATUS PILL */
+  .kommo-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .kommo-pill.ok { background: var(--blue-light); color: var(--blue); }
+  .kommo-pill.off { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+
+  /* FUNIL STAGE VISUAL */
+  .funil-stages { display: flex; gap: 0; margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .funil-stage { flex: 1; padding: 8px 6px; font-size: 10px; font-weight: 600; text-align: center; border-right: 1px solid var(--border); color: var(--text3); background: var(--surface2); }
+  .funil-stage:last-child { border-right: none; }
+  .funil-stage.active { background: var(--blue-light); color: var(--blue); }
+  .funil-stage .stage-icon { font-size: 14px; display: block; margin-bottom: 3px; }
+
+  /* INTEGRAÇÕES */
+  .integ-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); margin-bottom: 8px; }
+  .integ-icon { font-size: 22px; flex-shrink: 0; }
+  .integ-title { font-size: 13px; font-weight: 700; }
+  .integ-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .integ-status { margin-left: auto; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; flex-shrink: 0; cursor: pointer; border: none; font-family: inherit; }
+  .integ-status.ready { background: var(--accent-light); color: var(--accent); }
+  .integ-status.config { background: var(--amber-light); color: var(--amber); }
+  .integ-status.connected { background: var(--accent); color: #fff; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 9999; max-width: 320px; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 16px; padding: 28px; width: 520px; max-width: 90vw; box-shadow: var(--shadow-lg); }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .modal-step { background: var(--surface2); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--accent); }
+  .modal-step-num { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .modal-step-text { font-size: 12px; color: var(--text2); }
+  .modal-step-text a { color: var(--blue); }
+  .modal-step-text code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 11px; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── LOGIN ── */
+  .login-screen {
+    position: fixed; inset: 0; z-index: 9000;
+    background: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .login-screen.hidden { display: none; }
+
+  .login-box {
+    background: var(--surface); border-radius: 20px;
+    padding: 40px 44px; width: 400px; max-width: 90vw;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    animation: loginIn 0.35s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes loginIn {
+    from { opacity:0; transform: translateY(24px) scale(0.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .login-logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .login-logo-text { font-size: 17px; font-weight: 700; }
+  .login-logo-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+  .login-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+
+  .login-field { margin-bottom: 14px; }
+  .login-field label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+  .login-field input {
+    width: 100%; padding: 11px 14px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--bg);
+    font-family: inherit; font-size: 14px; color: var(--text);
+    outline: none; transition: border 0.15s;
+  }
+  .login-field input:focus { border-color: var(--accent); background: #fff; }
+
+  .login-btn {
+    width: 100%; padding: 12px; border-radius: 10px;
+    background: var(--accent); color: #fff;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    border: none; cursor: pointer; margin-top: 6px;
+    transition: background 0.15s;
+  }
+  .login-btn:hover { background: #155a3d; }
+  .login-btn:disabled { background: var(--text3); cursor: not-allowed; }
+
+  .login-error {
+    background: var(--red-light); border: 1px solid #fecaca;
+    border-radius: 8px; padding: 10px 12px;
+    font-size: 12px; color: var(--red); font-weight: 500;
+    margin-bottom: 14px; display: none;
+  }
+  .login-error.show { display: block; }
+
+  .login-footer { margin-top: 20px; font-size: 11px; color: var(--text3); text-align: center; }
+
+  /* ── USER BADGE NO TOPBAR ── */
+  .topbar-user {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--border); cursor: pointer;
+    transition: background 0.12s;
+  }
+  .topbar-user:hover { background: var(--bg); }
+  .topbar-user-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .topbar-user-name { font-size: 12px; font-weight: 600; }
+  .topbar-user-role { font-size: 10px; color: var(--text3); }
+
+  /* ── ACCESS DENIED ── */
+  .access-denied {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100%; gap: 12px;
+    color: var(--text3); font-size: 13px;
+  }
+  .access-denied .icon { font-size: 40px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     CONFIGURAÇÃO DO GOOGLE DRIVE
+     ════════════════════════════════════════════
+     PASSO 1: Coloque seu Client ID aqui:
+     (console.cloud.google.com → Credenciais → OAuth 2.0)
+-->
+<script>
+  const DRIVE_CONFIG = {
+    CLIENT_ID: 'SEU_CLIENT_ID_AQUI.apps.googleusercontent.com',
+    ROOT_FOLDER_ID: '',
+    SCOPES: 'https://www.googleapis.com/auth/drive.file',
+  };
+  const DRIVE_CONFIGURED = DRIVE_CONFIG.CLIENT_ID !== 'SEU_CLIENT_ID_AQUI.apps.googleusercontent.com';
+
+  // ════════════════════════════════════════════
+  // CONFIGURAÇÃO DO KOMMO
+  // ════════════════════════════════════════════
+  // Kommo → Configurações → Integrações → API → Chaves de acesso
+  const KOMMO_CONFIG = {
+    SUBDOMAIN: 'SEU_SUBDOMINIO',        // ex: "escritorioadv" se URL for escritorioadv.kommo.com
+    ACCESS_TOKEN: 'SEU_ACCESS_TOKEN',   // Token gerado na tela de integrações
+    PIPELINE_ID: 0,       // ID do funil principal (veja abaixo como obter)
+    STAGE_AGUARDANDO: 0,  // Etapa "Aguardando envio"
+    STAGE_CONFERENCIA: 0, // Etapa "Em conferência"
+    STAGE_PENDENCIA: 0,   // Etapa "Com pendência"
+    STAGE_COMPLETO: 0,    // Etapa "Documentação completa"
+    STAGE_ANALISE: 0,     // Etapa "Encaminhado para análise"
+  };
+  const KOMMO_CONFIGURED = KOMMO_CONFIG.ACCESS_TOKEN !== 'SEU_ACCESS_TOKEN' && KOMMO_CONFIG.SUBDOMAIN !== 'SEU_SUBDOMINIO';
+
+  // Log de webhooks (exibido na aba Integrações)
+  const webhookLog = [];
+
+  // ════════════════════════════════════════════
+  // USUÁRIOS DO SISTEMA
+  // Para adicionar usuário: copie um bloco e edite.
+  // roles: 'admin' vê tudo | 'user' vê só seus clientes
+  // ════════════════════════════════════════════
+  const USERS = [
+    { id: 'kauan',      nome: 'Kauan',      senha: 'kauan123',    role: 'admin',  avatar: 'K', cor: '#1a6b4a' },
+    { id: 'lucia',      nome: 'Lucia',      senha: 'lucia123',    role: 'user',   avatar: 'L', cor: '#2563eb' },
+    { id: 'inafran',    nome: 'Inafran',    senha: 'inafran123',  role: 'user',   avatar: 'I', cor: '#7c3aed' },
+    { id: 'juridico',   nome: 'Jurídico',   senha: 'juridico123', role: 'user',   avatar: 'J', cor: '#d97706' },
+    { id: 'conferencia',nome: 'Conferência',senha: 'conf123',     role: 'user',   avatar: 'C', cor: '#c0392b' },
+    { id: 'financeiro', nome: 'Financeiro', senha: 'fin123',      role: 'user',   avatar: 'F', cor: '#0891b2' },
+  ];
+
+  let currentUser = null; // usuário logado
+</script>
+
+<!-- ════════════════════════════════════════════
+     TELA DE LOGIN
+     ════════════════════════════════════════════ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚖️</div>
+      <div>
+        <div class="login-logo-text">Docs for attorney</div>
+        <div class="login-logo-sub">Portal Documental — Acesso restrito</div>
+      </div>
+    </div>
+
+    <div class="login-title">Bem-vindo de volta</div>
+    <div class="login-sub">Entre com suas credenciais para acessar o painel.</div>
+
+    <div class="login-error" id="login-error">Usuário ou senha incorretos. Tente novamente.</div>
+
+    <div class="login-field">
+      <label>Usuário</label>
+      <input type="text" id="login-user" placeholder="Ex: kauan" autocomplete="username"
+        onkeydown="if(event.key==='Enter') document.getElementById('login-pass').focus()">
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar no painel</button>
+
+    <div class="login-footer">🔒 Acesso restrito à equipe interna</div>
+  </div>
+</div>
+
+<div class="app" id="app-main" style="display:none;">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">⚖️</div>
+        <div>
+          <div class="logo-text">Docs for attorney</div>
+          <div class="logo-sub">Portal Documental</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Principal</div>
+      <div class="nav-item active" onclick="showView('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="showView('detail')"><span class="nav-icon">👥</span> Clientes <span class="nav-badge" id="badge-clientes">5</span></div>
+      <div class="nav-item" onclick="showView('portal')"><span class="nav-icon">🔗</span> Portal do Cliente</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Equipe</div>
+      <div class="nav-item" onclick="showView('integracoes')"><span class="nav-icon">🔌</span> Integrações <span class="nav-badge amber" id="integ-badge">!</span></div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span> Configurações</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-pill" onclick="confirmLogout()">
+        <div class="user-avatar" id="sidebar-avatar">K</div>
+        <div>
+          <div style="color:#fff;font-size:12px;font-weight:600;" id="sidebar-nome">Kauan</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);" id="sidebar-role">Admin • Sair</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <!-- DRIVE STATUS BAR -->
+    <div class="drive-bar" id="drive-bar">
+      <div class="drive-dot" id="drive-dot"></div>
+      <span id="drive-bar-text">Google Drive: não configurado</span>
+      <a onclick="showView('integracoes')">Configurar agora →</a>
+    </div>
+
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div class="topbar-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Buscar cliente, processo..." id="global-search" oninput="filterClients(this.value)">
+      </div>
+      <button class="topbar-btn ghost" onclick="showView('portal')">👁️ Ver portal</button>
+      <div class="topbar-user" onclick="confirmLogout()" title="Clique para sair">
+        <div class="topbar-user-avatar" id="topbar-avatar">K</div>
+        <div>
+          <div class="topbar-user-name" id="topbar-nome">Kauan</div>
+          <div class="topbar-user-role" id="topbar-role">Admin</div>
+        </div>
+      </div>
+      <button class="topbar-btn primary" id="btn-novo-cliente" onclick="openNewClientModal()">+ Novo cliente</button>
+    </div>
+
+    <div class="view">
+
+      <!-- DASHBOARD -->
+      <div class="view-panel active" id="view-dashboard">
+        <div class="panel-body">
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-label">Clientes ativos</div><div class="stat-value" id="stat-total" style="color:var(--text)">5</div><div class="stat-sub">📋 Total no sistema</div></div>
+            <div class="stat-card"><div class="stat-label">Com pendência</div><div class="stat-value" id="stat-pend" style="color:var(--amber)">2</div><div class="stat-sub">⚠️ Aguardam reenvio</div></div>
+            <div class="stat-card"><div class="stat-label">Em conferência</div><div class="stat-value" id="stat-conf" style="color:var(--blue)">1</div><div class="stat-sub">🔍 Revisão equipe</div></div>
+            <div class="stat-card"><div class="stat-label">Completos</div><div class="stat-value" id="stat-comp" style="color:var(--accent)">1</div><div class="stat-sub">✅ Docs aprovados</div></div>
+            <div class="stat-card"><div class="stat-label">No Drive</div><div class="stat-value" id="stat-drive" style="color:var(--purple)">0</div><div class="stat-sub">📁 Arquivos enviados</div></div>
+          </div>
+          <div class="list-header">
+            <h2>Todos os clientes</h2>
+            <div class="filter-pill active" onclick="setFilter(this,'Todos')">Todos</div>
+            <div class="filter-pill" onclick="setFilter(this,'pendência')">⚠️ Pendência</div>
+            <div class="filter-pill" onclick="setFilter(this,'conferência')">🔍 Conferência</div>
+            <div class="filter-pill" onclick="setFilter(this,'completa')">✅ Completo</div>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;">
+            <table class="client-table">
+              <thead><tr><th>Cliente</th><th>Tipo de ação</th><th>Responsável</th><th>Status</th><th>Prioridade</th><th>Progresso</th><th>SLA</th><th></th></tr></thead>
+              <tbody id="client-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETALHE -->
+      <div class="view-panel" id="view-detail">
+        <div class="detail-layout">
+          <div class="detail-list">
+            <div class="dlist-header">
+              <strong style="font-size:13px;">Clientes</strong>
+              <div class="dlist-search"><span>🔍</span><input type="text" placeholder="Buscar..." oninput="filterSideList(this.value)"></div>
+            </div>
+            <div id="side-list"></div>
+          </div>
+          <div class="detail-main" id="detail-main"></div>
+        </div>
+      </div>
+
+      <!-- PORTAL CLIENTE -->
+      <div class="view-panel" id="view-portal">
+        <div class="portal-view" id="portal-content"></div>
+      </div>
+
+      <!-- INTEGRAÇÕES -->
+      <div class="view-panel" id="view-integracoes">
+        <div class="panel-body">
+          <div style="max-width:720px;">
+            <h2 style="font-size:17px;font-weight:700;margin-bottom:4px;">🔌 Integrações</h2>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">Configure as conexões com serviços externos.</p>
+
+            <!-- Google Drive Setup -->
+            <div class="drive-setup" id="drive-setup-card">
+              <h3>📁 Configurar Google Drive</h3>
+              <p>Para ativar o upload real de documentos, você precisa de um <strong>Client ID</strong> do Google Cloud Console. É gratuito e leva cerca de 5 minutos.<br><br>
+              <strong>Como fazer:</strong> <a href="#" onclick="openDriveGuide()">Ver passo a passo →</a></p>
+              <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Seu Client ID</label>
+              <input type="text" id="client-id-input" placeholder="000000000000-xxxxxxxxxxxx.apps.googleusercontent.com" value="">
+              <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;margin-top:8px;">ID da pasta raiz no Drive (opcional)</label>
+              <input type="text" id="folder-id-input" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button class="action-btn primary" onclick="saveDriveConfig()">💾 Salvar e conectar</button>
+                <button class="action-btn secondary" onclick="openDriveGuide()">📖 Passo a passo</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">📁 Google Drive</div>
+              <div class="integ-card">
+                <div class="integ-icon">📁</div>
+                <div>
+                  <div class="integ-title">Upload automático de documentos</div>
+                  <div class="integ-desc">Arquivos enviados pelo cliente vão direto pro Drive, organizados em pastas por cliente e categoria. Nomenclatura: <code style="font-family:monospace;background:var(--bg);padding:1px 4px;border-radius:3px;">CLI-1048_Maria-Aparecida_RG-CNH_22-03-2026.pdf</code></div>
+                </div>
+                <div class="integ-status" id="drive-integ-status" onclick="scrollToDriveSetup()">Configurar</div>
+              </div>
+              <div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+                <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;">ESTRUTURA DE PASTAS NO DRIVE</div>
+                <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;">
+                  📁 Juridoc - Clientes/<br>
+                  &nbsp;&nbsp;📁 CLI-1048 - Maria Aparecida/<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;📁 Documentos pessoais/<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;📁 Renda e extratos/<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;📁 Complementares/<br>
+                  &nbsp;&nbsp;📁 CLI-1082 - José Carlos/<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;📁 Financiamento/<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;📁 Bem e processo/
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">📱 WhatsApp / Comunicação</div>
+              <div class="integ-card"><div class="integ-icon">💬</div><div><div class="integ-title">WhatsApp Business API</div><div class="integ-desc">Envio automático do link após cadastro. Lembrete de pendência. Confirmação de recebimento.</div></div><div class="integ-status config">Configurar</div></div>
+              <div style="margin-top:12px;">
+                <div class="card-title">📨 Modelo de mensagem</div>
+                <div class="whatsapp-box" id="wpp-preview">Olá, [Nome]! 👋
+
+Aqui é a equipe jurídica. Precisamos que você envie os documentos necessários para o andamento do seu processo.
+
+Acesse seu link exclusivo:
+portaljuridico.com/pendencias/[cliente]/...
+
+Qualquer dúvida, estamos à disposição! ⚖️</div>
+                <button class="action-btn secondary" onclick="copyElementText('wpp-preview')">📋 Copiar mensagem</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">📊 Kommo / CRM</div>
+
+              <!-- Setup card -->
+              <div class="kommo-setup" id="kommo-setup-card">
+                <h3>🎯 Configurar Kommo CRM</h3>
+                <p>Conecte o Kommo para criar leads automaticamente, atualizar etapas do funil e disparar o WhatsApp quando um cliente é cadastrado ou envia documentos.<br><br>
+                <strong>Como obter o Access Token:</strong> Kommo → Configurações → Integrações → API → Chaves de acesso → gerar token.</p>
+
+                <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Subdomínio da conta</label>
+                <input type="text" id="kommo-subdomain" placeholder="escritorioadv  (de escritorioadv.kommo.com)">
+
+                <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Access Token</label>
+                <input type="text" id="kommo-token" placeholder="eyJ0eXAiOiJKV1QiLCJhbGci...">
+
+                <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;margin-top:4px;">ID do Funil (Pipeline)</label>
+                <input type="number" id="kommo-pipeline" placeholder="123456">
+
+                <div style="margin-top:4px;margin-bottom:8px;">
+                  <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">IDs das Etapas do Funil</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px;">Aguardando envio</label><input type="number" id="stage-aguardando" placeholder="0" style="margin-bottom:0"></div>
+                    <div><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px;">Em conferência</label><input type="number" id="stage-conferencia" placeholder="0" style="margin-bottom:0"></div>
+                    <div><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px;">Com pendência</label><input type="number" id="stage-pendencia" placeholder="0" style="margin-bottom:0"></div>
+                    <div><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px;">Doc. completa</label><input type="number" id="stage-completo" placeholder="0" style="margin-bottom:0"></div>
+                    <div><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px;">Enc. p/ análise</label><input type="number" id="stage-analise" placeholder="0" style="margin-bottom:0"></div>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                  <button class="action-btn primary" style="background:var(--blue);" onclick="saveKommoConfig()">💾 Salvar e testar conexão</button>
+                  <button class="action-btn secondary" onclick="openKommoGuide()">📖 Como obter os IDs</button>
+                </div>
+              </div>
+
+              <!-- Status e funil visual -->
+              <div class="integ-card">
+                <div class="integ-icon">🎯</div>
+                <div style="flex:1;">
+                  <div class="integ-title">Kommo CRM <span class="kommo-pill off" id="kommo-status-pill">Não configurado</span></div>
+                  <div class="integ-desc">Ao configurar, cada evento do portal dispara uma ação automática no Kommo.</div>
+                  <div class="funil-stages" id="funil-visual">
+                    <div class="funil-stage"><span class="stage-icon">📝</span>Cadastro</div>
+                    <div class="funil-stage"><span class="stage-icon">⏳</span>Aguardando</div>
+                    <div class="funil-stage"><span class="stage-icon">📎</span>Enviando</div>
+                    <div class="funil-stage"><span class="stage-icon">🔍</span>Conferência</div>
+                    <div class="funil-stage"><span class="stage-icon">✅</span>Completo</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Eventos mapeados -->
+              <div style="margin-top:12px;">
+                <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Eventos que disparam ações no Kommo</div>
+                ${[
+                  ['➕ Novo cliente cadastrado','Cria lead no Kommo com nome, telefone e tipo de ação. Move para etapa "Aguardando envio".'],
+                  ['📎 Primeiro documento enviado','Atualiza lead para etapa "Em conferência". Salva link do Drive como nota.'],
+                  ['⚠️ Status mudado para pendência','Move etapa para "Com pendência". Cria tarefa pra equipe responsável.'],
+                  ['✅ Documentação completa','Move para "Documentação completa". Dispara mensagem de confirmação via WhatsApp.'],
+                  ['🚨 Caso marcado como urgente','Adiciona tag "URGENTE" no lead. Cria tarefa com prazo imediato.'],
+                  ['📝 Observação interna adicionada','Salva observação como nota privada no card do lead.'],
+                ].map(([ev,desc])=>`
+                  <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+                    <span style="font-weight:600;white-space:nowrap;">${ev}</span>
+                    <span style="color:var(--text2);">${desc}</span>
+                  </div>`).join('')}
+              </div>
+
+              <!-- Webhook log -->
+              <div class="webhook-log" id="webhook-log-box">
+                <div class="webhook-log-title">Log de eventos → Kommo</div>
+                <div id="webhook-log-items">
+                  <div class="webhook-log-item warn">
+                    <span class="webhook-log-time">--:--</span>
+                    <span class="webhook-log-event">[INFO]</span>
+                    <span class="webhook-log-msg">Configure o Kommo acima para ver os eventos aqui.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">🔐 Segurança</div>
+              <div class="integ-card"><div class="integ-icon">✅</div><div><div class="integ-title">Validação de arquivos</div><div class="integ-desc">Formatos aceitos: PDF, JPG, PNG, JPEG. Tamanho máximo: 20MB por arquivo.</div></div><div class="integ-status ready">Ativo</div></div>
+              <div class="integ-card"><div class="integ-icon">📜</div><div><div class="integ-title">LGPD e consentimento</div><div class="integ-desc">Termo de consentimento exibido no portal antes do primeiro envio.</div></div><div class="integ-status ready">Ativo</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /app-main -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal novo cliente -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-title">Novo cliente</div>
+    <div class="modal-sub">Preencha os dados básicos para cadastrar</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="new-nome" placeholder="Ex: João da Silva"></div>
+      <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="new-tel" placeholder="(11) 99999-0000"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo de ação</label>
+        <select class="form-select" id="new-acao">
+          <option value="superendividamento">Superendividamento</option>
+          <option value="revisaoDividas">Revisão de dívidas</option>
+          <option value="execucao">Execução de dívida</option>
+          <option value="apreensao">Busca e apreensão</option>
+          <option value="penhora">Penhora de bens</option>
+          <option value="exigencia">Cumprimento de exigência</option>
+          <option value="renegociacao">Renegociação extrajudicial</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Responsável</label>
+        <select class="form-select" id="new-resp">
+          <option>Kauan</option><option>Lucia</option><option>Inafran</option>
+          <option>Jurídico</option><option>Conferência</option><option>Financeiro</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="action-btn secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="action-btn primary" onclick="addClient()">Cadastrar cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal passo a passo Drive -->
+<div class="modal-overlay" id="modal-drive-guide">
+  <div class="modal" style="width:560px;">
+    <div class="modal-title">📁 Como configurar o Google Drive</div>
+    <div class="modal-sub">Siga os passos abaixo. Leva cerca de 5 minutos e é gratuito.</div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 1</div>
+      <div class="modal-step-text">Acesse <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> com a conta Google do escritório e crie um novo projeto chamado <strong>"Juridoc"</strong>.</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 2</div>
+      <div class="modal-step-text">No menu lateral: <strong>APIs e serviços → Biblioteca</strong> → busque <strong>"Google Drive API"</strong> → clique em <strong>Ativar</strong>.</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 3</div>
+      <div class="modal-step-text">Vá em <strong>APIs e serviços → Tela de consentimento OAuth</strong> → selecione <strong>Externo</strong> → preencha o nome do app e o e-mail → salve.</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 4</div>
+      <div class="modal-step-text">Vá em <strong>Credenciais → Criar credenciais → ID do cliente OAuth 2.0</strong> → tipo: <strong>Aplicativo da Web</strong> → em "Origens JavaScript autorizadas" adicione <code>http://localhost</code> e o domínio do seu site → copie o <strong>Client ID</strong> gerado.</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 5</div>
+      <div class="modal-step-text">Cole o Client ID no campo da aba Integrações. No Google Drive, crie uma pasta chamada <strong>"Juridoc - Clientes"</strong>, abra ela e copie o ID da URL (a parte após <code>/folders/</code>). Cole no campo "ID da pasta raiz".</div>
+    </div>
+    <div class="modal-btns">
+      <button class="action-btn primary" onclick="closeModal('modal-drive-guide');showView('integracoes')">Entendido, vou configurar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DADOS
+// ═══════════════════════════════════════════════════════════
+const actionTemplates = {
+  superendividamento: { nome:"Superendividamento", cor:"green", documentos:[
+    { categoria:"Documentos pessoais", itens:[
+      { id:"rg-cnh", nome:"RG ou CNH", comoObter:"Foto nítida frente e verso ou PDF.", obrigatorio:true },
+      { id:"cpf", nome:"CPF", comoObter:"Cartão do CPF ou print gov.br.", obrigatorio:true },
+      { id:"residencia", nome:"Comprovante de residência", comoObter:"Conta recente dos últimos 90 dias.", obrigatorio:true },
+    ]},
+    { categoria:"Renda e extratos", itens:[
+      { id:"holerites", nome:"3 últimos comprovantes de renda", comoObter:"Portal RH ou app da empresa.", obrigatorio:true },
+      { id:"extratos-contas", nome:"Extratos de todas as contas", comoObter:"Baixar em PDF com movimentação completa.", obrigatorio:true },
+      { id:"faturas", nome:"3 últimas faturas dos cartões", comoObter:"Baixar no app ou banco.", obrigatorio:true },
+    ]},
+    { categoria:"Complementares", itens:[
+      { id:"registrato", nome:"Relatório Registrato", comoObter:"Emitir no Banco Central com gov.br.", obrigatorio:true },
+      { id:"contratos-boletos", nome:"Contratos e boletos", comoObter:"Enviar documentos com valor ou taxas.", obrigatorio:false },
+    ]},
+  ]},
+  revisaoDividas: { nome:"Revisão de dívidas", cor:"blue", documentos:[
+    { categoria:"Contratos", itens:[
+      { id:"contrato-principal", nome:"Contrato principal", comoObter:"Solicitar ao banco ou baixar no app.", obrigatorio:true },
+      { id:"aditivos", nome:"Aditivos ou renegociações", comoObter:"Enviar termos novos assinados.", obrigatorio:false },
+    ]},
+    { categoria:"Pagamentos", itens:[
+      { id:"parcelas-pagas", nome:"Comprovantes de parcelas pagas", comoObter:"Comprovantes bancários ou recibos.", obrigatorio:true },
+      { id:"extratos-base", nome:"Extratos bancários do período", comoObter:"Período de contratação até hoje.", obrigatorio:true },
+    ]},
+  ]},
+  execucao: { nome:"Execução de dívida", cor:"amber", documentos:[
+    { categoria:"Base da execução", itens:[
+      { id:"contrato-execucao", nome:"Contrato que originou a dívida", comoObter:"Solicitar ao credor ou baixar no portal.", obrigatorio:true },
+      { id:"planilha-execucao", nome:"Planilha de cálculo atualizada", comoObter:"Enviar planilha recebida no processo.", obrigatorio:true },
+      { id:"citacao-intimacao", nome:"Citação ou intimação", comoObter:"PDF, foto ou print completo.", obrigatorio:true },
+    ]},
+    { categoria:"Documentos pessoais", itens:[
+      { id:"documentos-pessoais-execucao", nome:"RG, CPF e comprovante de residência", comoObter:"Documentos legíveis e atualizados.", obrigatorio:true },
+    ]},
+  ]},
+  apreensao: { nome:"Busca e apreensão", cor:"red", documentos:[
+    { categoria:"Financiamento", itens:[
+      { id:"contrato-financiamento", nome:"Contrato de financiamento", comoObter:"Solicitar ao banco ou baixar no app.", obrigatorio:true },
+      { id:"parcelas-financiamento", nome:"Comprovantes das parcelas pagas", comoObter:"Histórico do banco ou extratos.", obrigatorio:true },
+      { id:"notificacoes-apreensao", nome:"Notificações de cobrança", comoObter:"E-mails, cartas, SMS e WhatsApp.", obrigatorio:true },
+    ]},
+    { categoria:"Bem e processo", itens:[
+      { id:"documento-bem", nome:"Documento do veículo (CRLV)", comoObter:"CRLV digital ou físico legível.", obrigatorio:true },
+      { id:"decisoes-apreensao", nome:"Mandado ou decisão judicial", comoObter:"PDF do processo ou print do andamento.", obrigatorio:true },
+    ]},
+  ]},
+  penhora: { nome:"Penhora de bens", cor:"purple", documentos:[
+    { categoria:"Processo", itens:[
+      { id:"mandado-penhora", nome:"Mandado ou decisão de penhora", comoObter:"PDF do processo ou intimação.", obrigatorio:true },
+    ]},
+    { categoria:"Bem", itens:[
+      { id:"registro-imovel", nome:"Matrícula do imóvel", comoObter:"Solicitar no cartório competente.", obrigatorio:false },
+      { id:"comprovantes-propriedade", nome:"Comprovantes de propriedade", comoObter:"Notas, contratos e certidões.", obrigatorio:true },
+    ]},
+  ]},
+  exigencia: { nome:"Cumprimento de exigência", cor:"amber", documentos:[
+    { categoria:"Exigência", itens:[
+      { id:"despacho-exigencia", nome:"Despacho ou intimação recebida", comoObter:"Enviar o documento que indica a exigência.", obrigatorio:true },
+      { id:"documento-solicitado-1", nome:"Documento solicitado", comoObter:"Anexar o arquivo específico pedido.", obrigatorio:true },
+    ]},
+  ]},
+  renegociacao: { nome:"Renegociação extrajudicial", cor:"green", documentos:[
+    { categoria:"Negociação", itens:[
+      { id:"propostas-recebidas", nome:"Propostas recebidas", comoObter:"Prints, PDFs ou e-mails.", obrigatorio:true },
+      { id:"renda-renegociacao", nome:"Comprovantes de renda", comoObter:"Holerite, extrato ou benefício.", obrigatorio:true },
+    ]},
+  ]},
+};
+
+let clients = [
+  { id:"CLI-1048", nome:"Maria Aparecida", cpf:"***.***.***-12", telefone:"(11) 99999-1001", cidade:"São Paulo/SP", processoNumero:"0001234-55.2026.8.26.0001", acao:"execucao", responsavel:"Kauan", status:"Com pendência documental", prioridade:"Alta", etapa:"Aguardando reenvio", sla:"vence hoje às 18:00", consentimento:true, observacoes:[{texto:"Cliente informou que não possui holerite, enviará extrato de recebimento.",autor:"Kauan",data:"20/03 09:11"},{texto:"Faltam contrato e planilha da execução.",autor:"Kauan",data:"20/03 14:30"}], enviados:["citacao-intimacao","documentos-pessoais-execucao"], invalidos:[], pendentes:["contrato-execucao","planilha-execucao"], historico:[{data:"20/03 09:11",desc:"Cadastro criado no sistema."},{data:"20/03 09:19",desc:"Link inicial enviado por WhatsApp."},{data:"20/03 11:04",desc:"Cliente enviou 2 documentos."},{data:"20/03 14:30",desc:"Equipe marcou pendências documentais."}], driveFiles:{} },
+  { id:"CLI-1082", nome:"José Carlos", cpf:"***.***.***-44", telefone:"(31) 99999-1022", cidade:"Belo Horizonte/MG", processoNumero:"0008888-21.2026.8.13.0001", acao:"apreensao", responsavel:"Lucia", status:"Em conferência", prioridade:"Média", etapa:"Análise documental", sla:"vence amanhã às 11:00", consentimento:true, observacoes:[{texto:"Maior parte da documentação enviada.",autor:"Lucia",data:"19/03 18:00"}], enviados:["contrato-financiamento","parcelas-financiamento","documento-bem","decisoes-apreensao"], invalidos:[], pendentes:["notificacoes-apreensao"], historico:[{data:"19/03 16:22",desc:"Cadastro criado."},{data:"19/03 18:12",desc:"Cliente concluiu envio principal."}], driveFiles:{} },
+  { id:"CLI-1091", nome:"Valeska Santos", cpf:"***.***.***-09", telefone:"(27) 99999-1033", cidade:"Vitória/ES", processoNumero:"Sem processo informado", acao:"superendividamento", responsavel:"Inafran", status:"Aguardando envio inicial", prioridade:"Normal", etapa:"Cadastro inicial", sla:"aguardando primeiro envio", consentimento:false, observacoes:[{texto:"Cliente ainda não iniciou o envio da documentação.",autor:"Inafran",data:"21/03 08:55"}], enviados:[], invalidos:[], pendentes:["rg-cnh","cpf","residencia","holerites","extratos-contas","faturas","registrato"], historico:[{data:"21/03 08:55",desc:"Cadastro criado no sistema."}], driveFiles:{} },
+  { id:"CLI-1107", nome:"Roberto Souza", cpf:"***.***.***-81", telefone:"(34) 99999-1050", cidade:"Uberlândia/MG", processoNumero:"0019999-31.2026.8.13.0702", acao:"penhora", responsavel:"Jurídico", status:"Encaminhado para análise", prioridade:"Alta", etapa:"Análise jurídica", sla:"sob análise", consentimento:true, observacoes:[{texto:"Documentos do imóvel conferidos. Aguardar definição.",autor:"Jurídico",data:"18/03 10:30"}], enviados:["mandado-penhora","comprovantes-propriedade","registro-imovel"], invalidos:[], pendentes:[], historico:[{data:"18/03 10:02",desc:"Cliente iniciou envio."},{data:"18/03 12:15",desc:"Documentação completa conferida."},{data:"19/03 09:00",desc:"Encaminhado para análise jurídica."}], driveFiles:{} },
+  { id:"CLI-1115", nome:"Ana Beatriz Lima", cpf:"***.***.***-55", telefone:"(85) 99999-1066", cidade:"Fortaleza/CE", processoNumero:"0023456-11.2026.8.06.0001", acao:"revisaoDividas", responsavel:"Conferência", status:"Com pendência documental", prioridade:"Urgente", etapa:"Reenvio solicitado", sla:"vence em 2h", consentimento:true, observacoes:[{texto:"Contrato ilegível. Solicitar novo envio.",autor:"Conferência",data:"22/03 07:00"}], enviados:["parcelas-pagas"], invalidos:["contrato-principal"], pendentes:["extratos-base"], historico:[{data:"22/03 07:00",desc:"Cadastro criado."},{data:"22/03 07:30",desc:"Link enviado. Cliente acessou."},{data:"22/03 08:00",desc:"Contrato rejeitado — ilegível."}], driveFiles:{} },
+];
+
+let selectedClientId = clients[0].id;
+let activeFilter = 'Todos';
+let detailTab = 'docs';
+const portalState = {}; // docId -> { state: 'uploaded'|'naotem', driveUrl?, fileName? }
+let totalDriveFiles = 0;
+
+// ═══════════════════════════════════════════════════════════
+// GOOGLE DRIVE
+// ═══════════════════════════════════════════════════════════
+let driveToken = null;
+let driveReady = false;
+
+function initDrive() {
+  if (!DRIVE_CONFIGURED) { updateDriveBar(false); return; }
+  gapi.load('client', async () => {
+    await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] });
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: DRIVE_CONFIG.CLIENT_ID,
+      scope: DRIVE_CONFIG.SCOPES,
+      callback: (resp) => {
+        if (resp.error) { showToast('Erro ao conectar ao Drive.','❌'); return; }
+        driveToken = resp.access_token;
+        driveReady = true;
+        updateDriveBar(true);
+        showToast('Google Drive conectado!','📁');
+        document.getElementById('drive-integ-status').textContent = '✅ Conectado';
+        document.getElementById('drive-integ-status').className = 'integ-status connected';
+      },
+    });
+    tokenClient.requestAccessToken({ prompt: '' });
+  });
+}
+
+function updateDriveBar(connected) {
+  const dot = document.getElementById('drive-dot');
+  const text = document.getElementById('drive-bar-text');
+  const bar = document.getElementById('drive-bar');
+  if (connected) {
+    dot.classList.add('connected');
+    text.textContent = 'Google Drive: conectado — uploads ativos';
+    bar.querySelector('a').style.display = 'none';
+  } else {
+    dot.classList.remove('connected');
+    text.textContent = DRIVE_CONFIGURED ? 'Google Drive: conectando...' : 'Google Drive: não configurado';
+  }
+}
+
+async function getOrCreateFolder(name, parentId) {
+  // Busca a pasta
+  const q = `name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId || 'root'}' in parents and trashed=false`;
+  const res = await gapi.client.drive.files.list({ q, fields: 'files(id,name)', spaces: 'drive' });
+  if (res.result.files.length > 0) return res.result.files[0].id;
+  // Cria se não existe
+  const folder = await gapi.client.drive.files.create({
+    resource: { name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId || 'root'] },
+    fields: 'id',
+  });
+  return folder.result.id;
+}
+
+async function uploadToDrive(file, client, docName, categoria) {
+  // Monta estrutura de pastas: Raiz → CLI-XXXX - Nome → Categoria
+  const rootId = DRIVE_CONFIG.ROOT_FOLDER_ID || 'root';
+  const clientFolderName = `${client.id} - ${client.nome}`;
+  const clientFolderId = await getOrCreateFolder(clientFolderName, rootId);
+  const catFolderId = await getOrCreateFolder(categoria, clientFolderId);
+
+  // Nome do arquivo padronizado
+  const dateStr = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-');
+  const cleanDocName = docName.replace(/[^a-zA-Z0-9\u00C0-\u00FF ]/g,'').replace(/ /g,'-');
+  const cleanClientName = client.nome.replace(/ /g,'-');
+  const ext = file.name.split('.').pop();
+  const fileName = `${client.id}_${cleanClientName}_${cleanDocName}_${dateStr}.${ext}`;
+
+  // Upload multipart
+  const metadata = { name: fileName, parents: [catFolderId] };
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', file);
+
+  const resp = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${driveToken}` },
+    body: form,
+  });
+  const data = await resp.json();
+  return { fileId: data.id, url: data.webViewLink, fileName };
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function getClient(id) { return clients.find(c => c.id === id) || clients[0]; }
+function flatDocs(template) { return template.documentos.flatMap(g => g.itens.map(i => ({ ...i, categoria: g.categoria }))); }
+function calcProgress(c) {
+  const t = actionTemplates[c.acao]; if (!t) return 0;
+  const all = flatDocs(t).filter(d => d.obrigatorio);
+  if (!all.length) return 0;
+  return Math.round(all.filter(d => c.enviados.includes(d.id)).length / all.length * 100);
+}
+function statusBadge(s) {
+  if (s.includes('pendência')) return `<span class="badge amber">⚠️ ${s}</span>`;
+  if (s.includes('conferência')) return `<span class="badge blue">🔍 ${s}</span>`;
+  if (s.includes('completa') || s.includes('análise')) return `<span class="badge green">✅ ${s}</span>`;
+  return `<span class="badge gray">${s}</span>`;
+}
+function prioBadge(p) {
+  if (p==='Urgente') return `<span class="badge red">🔴 ${p}</span>`;
+  if (p==='Alta') return `<span class="badge amber">🟠 ${p}</span>`;
+  if (p==='Média') return `<span class="badge blue">🔵 ${p}</span>`;
+  return `<span class="badge gray">⚪ ${p}</span>`;
+}
+function acaoBadge(acao) {
+  const t = actionTemplates[acao]; if (!t) return acao;
+  return `<span class="badge ${t.cor}">${t.nome}</span>`;
+}
+function generateLink(c, type) {
+  const slug = c.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-');
+  const id = c.id.toLowerCase();
+  const paths = { inicial:`/iniciar/${id}-${slug}`, pendencia:`/pendencias/${id}-${slug}`, reenvio:`/reenvio/${id}-${slug}` };
+  return `portaljuridico.com${paths[type]||'/'}`;
+}
+function showToast(msg, emoji='✅') {
+  const t = document.getElementById('toast');
+  t.innerHTML = `${emoji} ${msg}`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function copyText(text) { if (navigator.clipboard) navigator.clipboard.writeText(text); showToast('Copiado!','📋'); }
+function copyElementText(id) { copyText(document.getElementById(id).innerText); }
+function now() { return new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+
+function validateFile(file) {
+  const allowed = ['application/pdf','image/jpeg','image/jpg','image/png'];
+  const maxSize = 20 * 1024 * 1024; // 20MB
+  if (!allowed.includes(file.type)) return { ok: false, msg: 'Formato inválido. Use PDF, JPG ou PNG.' };
+  if (file.size > maxSize) return { ok: false, msg: `Arquivo muito grande (${(file.size/1024/1024).toFixed(1)}MB). Máximo: 20MB.` };
+  return { ok: true };
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════════
+function showView(view) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  const titles = { dashboard:'Dashboard', detail:'Clientes', portal:'Portal do Cliente', integracoes:'Integrações' };
+  document.getElementById('topbar-title').textContent = titles[view] || '';
+  const navIdx = { dashboard:0, detail:1, portal:2, integracoes:3 };
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navIdx[view] !== undefined) navItems[navIdx[view]].classList.add('active');
+  if (view==='detail') { renderSideList(); renderDetail(); }
+  if (view==='portal') renderPortal();
+  if (view==='dashboard') { renderTable(); updateStats(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function getVisibleClients() {
+  if (!currentUser || currentUser.role === 'admin') return clients;
+  return clients.filter(c => c.responsavel.toLowerCase() === currentUser.nome.toLowerCase());
+}
+function getFilteredClients() {
+  const vis = getVisibleClients();
+  return activeFilter==='Todos' ? vis : vis.filter(c=>c.status.toLowerCase().includes(activeFilter));
+}
+function updateStats() {
+  const vis = getVisibleClients();
+  const t = document.getElementById('stat-total'); if(t) t.textContent = vis.length;
+  const p = document.getElementById('stat-pend'); if(p) p.textContent = vis.filter(c=>c.status.includes('pendência')).length;
+  const co = document.getElementById('stat-conf'); if(co) co.textContent = vis.filter(c=>c.status.includes('conferência')).length;
+  const cm = document.getElementById('stat-comp'); if(cm) cm.textContent = vis.filter(c=>c.status.includes('completa')||c.status.includes('análise')).length;
+  const dr = document.getElementById('stat-drive'); if(dr) dr.textContent = totalDriveFiles;
+  const bc = document.getElementById('badge-clientes'); if(bc) bc.textContent = vis.length;
+}
+function renderTable(list) {
+  const filtered = list || getFilteredClients();
+  const tbody = document.getElementById('client-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map(c => {
+    const prog = calcProgress(c);
+    const slaColor = c.sla.includes('hoje')||c.sla.includes('2h') ? 'var(--red)' : c.sla.includes('amanhã') ? 'var(--amber)' : 'var(--text3)';
+    const hasDrive = Object.keys(c.driveFiles||{}).length > 0;
+    return `<tr onclick="selectClient('${c.id}');showView('detail');" ${c.id===selectedClientId?'class="selected"':''}>
+      <td><div class="name-cell"><div class="name-avatar">${c.nome[0]}</div><div><div class="name-main">${c.nome} ${hasDrive?'<span title="Tem arquivos no Drive" style="font-size:10px;">📁</span>':''}</div><div class="name-sub">${c.id} • ${c.cidade}</div></div></div></td>
+      <td>${acaoBadge(c.acao)}</td>
+      <td><span style="font-size:13px;font-weight:500;">${c.responsavel}</span></td>
+      <td>${statusBadge(c.status)}</td>
+      <td>${prioBadge(c.prioridade)}</td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div><span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;">${prog}%</span></div></td>
+      <td><span style="font-size:11px;color:${slaColor};font-weight:500;">⏱ ${c.sla}</span></td>
+      <td><button class="action-btn secondary" style="font-size:11px;padding:5px 10px;" onclick="event.stopPropagation();selectClient('${c.id}');showView('detail');">Abrir →</button></td>
+    </tr>`;
+  }).join('');
+}
+function setFilter(el, filter) { document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); activeFilter=filter; renderTable(); }
+function filterClients(term) {
+  const t=term.toLowerCase();
+  const vis=getVisibleClients();
+  renderTable(vis.filter(c=>c.nome.toLowerCase().includes(t)||c.id.toLowerCase().includes(t)||c.status.toLowerCase().includes(t)||c.responsavel.toLowerCase().includes(t)));
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDE LIST
+// ═══════════════════════════════════════════════════════════
+function renderSideList(term) {
+  const vis = getVisibleClients();
+  const list = term ? vis.filter(c=>c.nome.toLowerCase().includes(term.toLowerCase())) : vis;
+  const el = document.getElementById('side-list'); if(!el) return;
+  el.innerHTML = list.map(c=>`
+    <div class="client-item ${c.id===selectedClientId?'active':''}" onclick="selectClient('${c.id}')">
+      <div class="ci-name">${c.nome}</div>
+      <div class="ci-row"><span class="ci-type">${actionTemplates[c.acao]?.nome||c.acao}</span><span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);">${calcProgress(c)}%</span></div>
+      <div style="margin-top:6px;">${statusBadge(c.status)}</div>
+    </div>`).join('') || '<div style="padding:16px;font-size:12px;color:var(--text3);">Nenhum cliente atribuído a você.</div>';
+}
+function filterSideList(term) { renderSideList(term); }
+function selectClient(id) { selectedClientId=id; renderSideList(); renderDetail(); }
+
+
+// ═══════════════════════════════════════════════════════════
+// DETALHE DO CLIENTE
+// ═══════════════════════════════════════════════════════════
+function renderDetail() {
+  const c = getClient(selectedClientId);
+  const t = actionTemplates[c.acao];
+  const prog = calcProgress(c);
+
+  document.getElementById('detail-main').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-header-top">
+        <div>
+          <div class="detail-name">${c.nome}</div>
+          <div class="detail-meta">
+            <span class="detail-meta-item">🪪 ${c.id}</span>
+            <span class="detail-meta-item">📍 ${c.cidade}</span>
+            <span class="detail-meta-item">📞 ${c.telefone}</span>
+            <span class="detail-meta-item">⚖️ ${c.processoNumero}</span>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">${statusBadge(c.status)} ${prioBadge(c.prioridade)} ${acaoBadge(c.acao)}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Docs obrigatórios</div>
+          <div style="font-size:28px;font-weight:700;color:${prog===100?'var(--accent)':'var(--text)'};">${prog}%</div>
+          <div class="progress-bar" style="width:100px;margin-top:6px;margin-left:auto;"><div class="progress-fill" style="width:${prog}%"></div></div>
+          ${Object.keys(c.driveFiles||{}).length > 0 ? `<div style="font-size:10px;color:var(--accent);margin-top:6px;">📁 ${Object.keys(c.driveFiles).length} arquivo(s) no Drive</div>` : ''}
+        </div>
+      </div>
+      <div class="action-btns">
+        <button class="action-btn primary" onclick="copyText('${generateLink(c,'pendencia')}')">🔗 Link de pendência</button>
+        <button class="action-btn blue-btn" onclick="copyText('${generateLink(c,'inicial')}')">📎 Link inicial</button>
+        <button class="action-btn amber-btn" onclick="copyWppMsg('${c.id}')">💬 Copiar msg WhatsApp</button>
+        <button class="action-btn secondary" onclick="changeStatus('${c.id}')">🔄 Mudar status</button>
+        <button class="action-btn secondary" onclick="changeResponsavel('${c.id}')">👤 Responsável</button>
+        <button class="action-btn red-btn" onclick="setUrgente('${c.id}')">🚨 Urgente</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Configurações do caso</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-select" onchange="updateField('${c.id}','status',this.value)">
+            ${['Com pendência documental','Em conferência','Aguardando envio inicial','Encaminhado para análise','Documentação completa'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}
+          </select></div>
+        <div class="form-group"><label class="form-label">Prioridade</label>
+          <select class="form-select" onchange="updateField('${c.id}','prioridade',this.value)">
+            ${['Urgente','Alta','Média','Normal'].map(p=>`<option ${c.prioridade===p?'selected':''}>${p}</option>`).join('')}
+          </select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Responsável</label>
+          <select class="form-select" onchange="updateField('${c.id}','responsavel',this.value)">
+            ${['Kauan','Lucia','Inafran','Jurídico','Conferência','Financeiro'].map(r=>`<option ${c.responsavel===r?'selected':''}>${r}</option>`).join('')}
+          </select></div>
+        <div class="form-group"><label class="form-label">Etapa atual</label>
+          <input class="form-input" value="${c.etapa}" onchange="updateField('${c.id}','etapa',this.value)"></div>
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab-btn ${detailTab==='docs'?'active':''}" onclick="switchTab('docs')">📄 Documentos</button>
+      <button class="tab-btn ${detailTab==='link'?'active':''}" onclick="switchTab('link')">🔗 Links</button>
+      <button class="tab-btn ${detailTab==='obs'?'active':''}" onclick="switchTab('obs')">📝 Observações</button>
+      <button class="tab-btn ${detailTab==='hist'?'active':''}" onclick="switchTab('hist')">🕒 Histórico</button>
+    </div>
+
+    <div class="tab-content ${detailTab==='docs'?'active':''}" id="tab-docs">
+      ${t.documentos.map(group=>`
+        <div class="card">
+          <div class="card-title">📂 ${group.categoria}</div>
+          ${group.itens.map(doc=>{
+            const sent = c.enviados.includes(doc.id);
+            const invalid = c.invalidos.includes(doc.id);
+            const driveFile = (c.driveFiles||{})[doc.id];
+            return `<div class="doc-item ${sent?'sent':invalid?'invalid':'pending'}">
+              <div class="doc-status-icon">${sent?'✅':invalid?'❌':'⏳'}</div>
+              <div style="flex:1;">
+                <div class="doc-name">${doc.nome} ${doc.obrigatorio?'<span style="color:var(--red);font-size:10px;">*obrigatório</span>':''}</div>
+                <div class="doc-cat">💡 ${doc.comoObter}</div>
+                ${driveFile ? `<a href="${driveFile.url}" target="_blank" class="doc-drive-link">📁 Ver no Drive — ${driveFile.fileName}</a>` : ''}
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                ${!sent?`<button class="doc-action mark-ok" onclick="markDoc('${c.id}','${doc.id}','sent')">✅ Aprovar</button>`:''}
+                ${!invalid?`<button class="doc-action mark-invalid" onclick="markDoc('${c.id}','${doc.id}','invalid')">❌ Inválido</button>`:''}
+                ${sent||invalid?`<button class="doc-action request" onclick="markDoc('${c.id}','${doc.id}','pending')">↩️ Pendente</button>`:''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`).join('')}
+    </div>
+
+    <div class="tab-content ${detailTab==='link'?'active':''}" id="tab-link">
+      <div class="card">
+        <div class="card-title">🔗 Links gerados</div>
+        ${['inicial','pendencia','reenvio'].map(type=>{
+          const lk = generateLink(c, type);
+          const labels = { inicial:'Link inicial', pendencia:'Link de pendência', reenvio:'Link de reenvio' };
+          return `<div style="margin-bottom:14px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${labels[type]}</div>
+            <div class="link-box">${lk}</div>
+            <button class="action-btn secondary" style="font-size:12px;" onclick="copyText('${lk}')">📋 Copiar</button>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title">💬 Mensagem WhatsApp pronta</div>
+        <div class="whatsapp-box" id="wpp-msg-${c.id}">Olá, ${c.nome}! 👋\n\nAqui é a equipe jurídica. Precisamos que você envie os documentos necessários para o andamento do seu processo de ${t.nome}.\n\nAcesse seu link exclusivo e envie de forma simples e segura:\n${generateLink(c,'pendencia')}\n\nQualquer dúvida, estamos à disposição! ⚖️</div>
+        <button class="action-btn primary" onclick="copyElementText('wpp-msg-${c.id}')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <div class="tab-content ${detailTab==='obs'?'active':''}" id="tab-obs">
+      <div class="card">
+        <div class="card-title">📝 Nova observação</div>
+        <textarea class="form-textarea" id="new-obs-${c.id}" placeholder="Registre detalhes, pendências ou informações para a equipe..."></textarea>
+        <div style="margin-top:8px;"><button class="action-btn primary" onclick="addObservation('${c.id}')">Adicionar</button></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Histórico de observações</div>
+        ${c.observacoes.length ? c.observacoes.map(obs=>`
+          <div class="obs-item">${obs.texto}<div class="obs-meta">👤 ${obs.autor} • ${obs.data}</div></div>`).join('') : '<p style="font-size:13px;color:var(--text3);">Nenhuma observação ainda.</p>'}
+      </div>
+    </div>
+
+    <div class="tab-content ${detailTab==='hist'?'active':''}" id="tab-hist">
+      <div class="card">
+        <div class="card-title">🕒 Linha do tempo</div>
+        ${c.historico.map(h=>`<div class="hist-item"><span class="hist-time">${h.data}</span><span class="hist-desc">${h.desc}</span></div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function switchTab(tab) { detailTab=tab; renderDetail(); }
+
+function updateField(id, field, value) {
+  const c = clients.find(cl=>cl.id===id); if (!c) return;
+  c[field] = value;
+  c.historico.push({ data:now(), desc:`"${field}" atualizado para "${value}".` });
+  showToast(`${field} atualizado!`,'💾');
+  if (field === 'status') onStatusChanged(c, value);
+  renderSideList(); renderTable(); updateStats();
+}
+
+function markDoc(clientId, docId, state) {
+  const c = clients.find(cl=>cl.id===clientId); if (!c) return;
+  c.enviados = c.enviados.filter(d=>d!==docId);
+  c.invalidos = c.invalidos.filter(d=>d!==docId);
+  c.pendentes = c.pendentes.filter(d=>d!==docId);
+  if (state==='sent') { c.enviados.push(docId); showToast('Documento aprovado!','✅'); }
+  if (state==='invalid') { c.invalidos.push(docId); showToast('Marcado como inválido.','❌'); }
+  if (state==='pending') { c.pendentes.push(docId); showToast('Movido para pendentes.','⏳'); }
+  c.historico.push({ data:now(), desc:`Documento "${docId}" marcado como "${state}".` });
+  renderDetail(); renderTable();
+}
+
+function addObservation(clientId) {
+  const el = document.getElementById('new-obs-'+clientId);
+  if (!el||!el.value.trim()) return;
+  const c = clients.find(cl=>cl.id===clientId);
+  c.observacoes.unshift({ texto:el.value.trim(), autor:'Kauan', data:now() });
+  c.historico.push({ data:now(), desc:'Observação interna adicionada.' });
+  onObservacaoAdicionada(c, el.value.trim());
+  el.value=''; showToast('Observação adicionada!','📝'); renderDetail();
+}
+
+function changeStatus(id) {
+  const c=getClient(id);
+  const opts=['Com pendência documental','Em conferência','Aguardando envio inicial','Encaminhado para análise','Documentação completa'];
+  c.status=opts[(opts.indexOf(c.status)+1)%opts.length];
+  showToast(`Status: ${c.status}`,'🔄');
+  onStatusChanged(c, c.status);
+  renderDetail(); renderSideList(); renderTable(); updateStats();
+}
+
+function changeResponsavel(id) {
+  const c=getClient(id);
+  const opts=['Kauan','Lucia','Inafran','Jurídico','Conferência','Financeiro'];
+  c.responsavel=opts[(opts.indexOf(c.responsavel)+1)%opts.length];
+  showToast(`Responsável: ${c.responsavel}`,'👤'); renderDetail(); renderSideList();
+}
+
+function setUrgente(id) {
+  const c=getClient(id); c.prioridade='Urgente';
+  c.historico.push({ data:now(), desc:'Caso marcado como URGENTE.' });
+  showToast('Marcado como urgente!','🚨');
+  onUrgente(c);
+  renderDetail(); renderTable();
+}
+
+function copyWppMsg(clientId) {
+  const el=document.getElementById('wpp-msg-'+clientId);
+  if (el) copyText(el.innerText);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PORTAL DO CLIENTE — com upload real pro Drive
+// ═══════════════════════════════════════════════════════════
+function renderPortal() {
+  const c = getClient(selectedClientId);
+  const t = actionTemplates[c.acao];
+  const allDocs = flatDocs(t);
+  const done = allDocs.filter(d=>portalState[d.id]?.state==='uploaded'||c.enviados.includes(d.id)).length;
+  const pct = allDocs.length ? Math.round(done/allDocs.length*100) : 0;
+
+  document.getElementById('portal-content').innerHTML = `
+    <div class="portal-header">
+      <div class="portal-logo">⚖️ <span>Docs for attorney — Portal Documental</span></div>
+      <div class="portal-name">Olá, ${c.nome}!</div>
+      <span class="portal-action-badge">${t.nome}</span>
+      <div class="portal-progress">
+        <div class="portal-prog-bar"><div class="portal-prog-fill" style="width:${pct}%"></div></div>
+        <span class="portal-prog-label">${done} de ${allDocs.length} enviados</span>
+      </div>
+    </div>
+
+    <div class="portal-body">
+      ${!c.consentimento ? `
+        <div class="card" style="border-color:#fde68a;background:var(--amber-light);margin-bottom:20px;">
+          <div class="card-title">📋 Consentimento LGPD</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Para enviar os documentos, confirme que autoriza o tratamento dos seus dados pela equipe jurídica conforme a LGPD.</p>
+          <button class="action-btn primary" onclick="confirmConsent('${c.id}')">✅ Confirmar e continuar</button>
+        </div>` : ''}
+
+      ${!driveReady && DRIVE_CONFIGURED ? `
+        <div class="card" style="border-color:#bfdbfe;background:var(--blue-light);margin-bottom:16px;">
+          <div class="card-title">🔗 Conectar ao Google Drive</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Para que os documentos sejam salvos automaticamente na nuvem, conecte sua conta Google.</p>
+          <button class="action-btn primary" onclick="initDrive()">📁 Conectar Google Drive</button>
+        </div>` : ''}
+
+      ${t.documentos.map(group=>`
+        <div class="portal-cat">
+          <div class="portal-cat-title">${group.categoria}</div>
+          ${group.itens.map(doc=>{
+            const already = c.enviados.includes(doc.id);
+            const st = portalState[doc.id];
+            const isUploaded = already || st?.state==='uploaded';
+            const isNaotem = st?.state==='naotem';
+            const isUploading = st?.state==='uploading';
+            const driveUrl = st?.driveUrl;
+            const fileName = st?.fileName;
+            return `<div class="portal-doc ${isUploaded?'uploaded':isNaotem?'naotem':isUploading?'uploading':''}" id="pdoc-${doc.id}">
+              <div class="portal-doc-header">
+                <div class="portal-doc-icon">${isUploaded?'✅':isNaotem?'📝':isUploading?'⏳':'📄'}</div>
+                <div class="portal-doc-info">
+                  <div class="portal-doc-name">${doc.nome}</div>
+                  <div class="portal-doc-hint">💡 ${doc.comoObter}</div>
+                  ${doc.obrigatorio?'<div class="portal-doc-obrig">* Documento obrigatório</div>':''}
+                  ${driveUrl?`<a href="${driveUrl}" target="_blank" style="font-size:11px;color:var(--blue);display:flex;align-items:center;gap:3px;margin-top:4px;">📁 Ver no Drive — ${fileName||'arquivo'}</a>`:''}
+                </div>
+              </div>
+
+              <!-- Input file oculto -->
+              <input type="file" id="file-input-${doc.id}" accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+                onchange="handleFileSelect(event,'${c.id}','${doc.id}','${doc.nome}','${group.categoria}')">
+
+              <div class="portal-doc-actions" id="actions-${doc.id}">
+                ${isUploaded ? `
+                  <span class="portal-action-btn done-btn">✅ Enviado${driveReady?' e salvo no Drive':''}</span>
+                  <button class="portal-action-btn naotem-btn" onclick="portalUndo('${doc.id}')">↩️ Desfazer</button>
+                ` : isNaotem ? `
+                  <span class="portal-action-btn naotem-btn">📝 Declaração registrada</span>
+                  <button class="portal-action-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text2);" onclick="portalUndo('${doc.id}')">↩️ Voltar</button>
+                ` : isUploading ? `
+                  <span style="font-size:12px;color:var(--blue);font-weight:600;">⏳ Enviando para o Drive...</span>
+                ` : `
+                  <button class="portal-action-btn upload" onclick="document.getElementById('file-input-${doc.id}').click()">📎 Selecionar arquivo</button>
+                  <button class="portal-action-btn naotem-btn" onclick="toggleNaotem('${doc.id}')">❌ Não tenho este documento</button>
+                `}
+              </div>
+
+              ${isUploading ? `
+                <div class="upload-progress" id="progress-${doc.id}">
+                  <div class="upload-progress-bar"><div class="upload-progress-fill" style="width:0%" id="prog-fill-${doc.id}"></div></div>
+                  <div class="upload-progress-label" id="prog-label-${doc.id}">Preparando...</div>
+                </div>` : ''}
+
+              <div class="portal-naotem-form" id="naotem-${doc.id}">
+                <p>Informe o motivo pelo qual não possui este documento:</p>
+                <textarea placeholder="Ex: Não possuo veículo em meu nome..." id="naotem-text-${doc.id}"></textarea>
+                <button onclick="confirmNaotem('${doc.id}')">✅ Confirmar declaração</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`).join('')}
+
+      <div class="portal-footer">
+        🔒 Dados protegidos conforme LGPD • ${driveReady?'📁 Arquivos salvos automaticamente no Google Drive':'📁 Configure o Drive para salvar automaticamente'} • ${new Date().toLocaleDateString('pt-BR')}
+      </div>
+    </div>
+  `;
+}
+
+async function handleFileSelect(event, clientId, docId, docName, categoria) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const validation = validateFile(file);
+  if (!validation.ok) { showToast(validation.msg, '❌'); return; }
+
+  const c = clients.find(cl=>cl.id===clientId);
+
+  if (driveReady) {
+    // Upload real pro Drive
+    portalState[docId] = { state: 'uploading' };
+    renderPortal();
+
+    try {
+      // Simula progresso visual
+      let prog = 0;
+      const interval = setInterval(() => {
+        prog = Math.min(prog + Math.random() * 20, 85);
+        const fill = document.getElementById(`prog-fill-${docId}`);
+        const label = document.getElementById(`prog-label-${docId}`);
+        if (fill) fill.style.width = prog + '%';
+        if (label) label.textContent = `Enviando... ${Math.round(prog)}%`;
+      }, 300);
+
+      const result = await uploadToDrive(file, c, docName, categoria);
+      clearInterval(interval);
+
+      // Salva referência
+      if (!c.driveFiles) c.driveFiles = {};
+      c.driveFiles[docId] = { url: result.url, fileName: result.fileName, fileId: result.fileId };
+      portalState[docId] = { state: 'uploaded', driveUrl: result.url, fileName: result.fileName };
+      totalDriveFiles++;
+
+      c.enviados.push(docId);
+      c.historico.push({ data:now(), desc:`Documento "${docName}" enviado ao Drive: ${result.fileName}` });
+      onDocumentoEnviado(c, docName, result.url);
+
+      showToast(`✅ ${docName} salvo no Drive!`, '📁');
+      renderPortal(); renderDetail(); updateStats();
+
+    } catch (err) {
+      console.error(err);
+      portalState[docId] = null;
+      showToast('Erro no upload. Tente novamente.', '❌');
+      renderPortal();
+    }
+  } else {
+    // Modo sem Drive: simula upload local
+    portalState[docId] = { state: 'uploading' };
+    renderPortal();
+    await new Promise(r => setTimeout(r, 1200));
+    portalState[docId] = { state: 'uploaded', fileName: file.name };
+    c.enviados.push(docId);
+    c.historico.push({ data:now(), desc:`Documento "${docName}" recebido (${(file.size/1024).toFixed(0)}KB). Drive não configurado.` });
+    onDocumentoEnviado(c, docName, null);
+    showToast(`Arquivo recebido! Configure o Drive para salvar na nuvem.`, '📄');
+    renderPortal(); renderDetail(); updateStats();
+  }
+}
+
+function portalUpload(docId) { document.getElementById('file-input-'+docId)?.click(); }
+function toggleNaotem(docId) { const f=document.getElementById('naotem-'+docId); if(f) f.classList.toggle('open'); }
+function confirmNaotem(docId) { portalState[docId]={state:'naotem'}; showToast('Declaração registrada.','📝'); renderPortal(); }
+function portalUndo(docId) {
+  const c = getClient(selectedClientId);
+  if (portalState[docId]?.driveUrl) {
+    // Remove do array de enviados mas mantém no Drive
+    c.enviados = c.enviados.filter(d=>d!==docId);
+    delete c.driveFiles[docId];
+    totalDriveFiles--;
+  }
+  delete portalState[docId];
+  c.enviados = c.enviados.filter(d=>d!==docId);
+  renderPortal(); updateStats();
+}
+function confirmConsent(clientId) {
+  const c=clients.find(cl=>cl.id===clientId); if(c) c.consentimento=true;
+  showToast('Consentimento confirmado!','✅'); renderPortal();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL NOVO CLIENTE
+// ═══════════════════════════════════════════════════════════
+function openNewClientModal() { document.getElementById('modal-new').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function addClient() {
+  const nome=document.getElementById('new-nome').value.trim();
+  const tel=document.getElementById('new-tel').value.trim();
+  const acao=document.getElementById('new-acao').value;
+  const resp=document.getElementById('new-resp').value;
+  if (!nome) { showToast('Preencha o nome!','⚠️'); return; }
+  const id='CLI-'+(1200+clients.length);
+  const allIds=flatDocs(actionTemplates[acao]).map(d=>d.id);
+  clients.push({ id, nome, telefone:tel||'(--) -----', cpf:'***.***.***.00', cidade:'—', processoNumero:'Sem processo informado', acao, responsavel:resp, status:'Aguardando envio inicial', prioridade:'Normal', etapa:'Cadastro inicial', sla:'aguardando primeiro envio', consentimento:false, observacoes:[], enviados:[], invalidos:[], pendentes:allIds, historico:[{data:now(),desc:'Cadastro criado no sistema.'}], driveFiles:{} });
+  closeModal('modal-new');
+  document.getElementById('new-nome').value='';
+  document.getElementById('new-tel').value='';
+  showToast(`${nome} cadastrado com sucesso!`,'🎉');
+  selectedClientId=id; renderSideList(); renderTable(); updateStats(); showView('detail');
+  // Kommo: cria lead
+  onClienteCreated(clients[clients.length-1]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONFIGURAÇÃO DO DRIVE PELA INTERFACE
+// ═══════════════════════════════════════════════════════════
+function saveDriveConfig() {
+  const clientId = document.getElementById('client-id-input').value.trim();
+  const folderId = document.getElementById('folder-id-input').value.trim();
+  if (!clientId || !clientId.includes('.apps.googleusercontent.com')) {
+    showToast('Client ID inválido. Verifique e tente novamente.','❌'); return;
+  }
+  DRIVE_CONFIG.CLIENT_ID = clientId;
+  if (folderId) DRIVE_CONFIG.ROOT_FOLDER_ID = folderId;
+  showToast('Configuração salva! Conectando...','💾');
+  initDrive();
+}
+
+function openDriveGuide() { document.getElementById('modal-drive-guide').classList.add('open'); }
+function scrollToDriveSetup() { showView('integracoes'); setTimeout(()=>document.getElementById('drive-setup-card')?.scrollIntoView({behavior:'smooth'}),200); }
+
+</script>
+
+<!-- Modal guia Kommo -->
+<div class="modal-overlay" id="modal-kommo-guide">
+  <div class="modal" style="width:560px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-title">🎯 Como configurar o Kommo</div>
+    <div class="modal-sub">Siga os passos para obter o Access Token e os IDs do funil.</div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 1 — Access Token</div>
+      <div class="modal-step-text">No Kommo: <strong>Configurações → Integrações → API</strong>. Clique em <strong>"Chaves de acesso"</strong> e gere um novo token. Copie o <strong>Access Token</strong> (o longo).</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 2 — Subdomínio</div>
+      <div class="modal-step-text">Olhe a URL da sua conta do Kommo. Se for <code>escritorioadv.kommo.com</code>, o subdomínio é <code>escritorioadv</code>.</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 3 — ID do funil e etapas</div>
+      <div class="modal-step-text">Acesse via API: <code>https://SEU_SUBDOMINIO.kommo.com/api/v4/leads/pipelines</code> com o token no header <code>Authorization: Bearer SEU_TOKEN</code>. O campo <code>id</code> é o ID do funil e dentro de <code>_embedded.statuses</code> estão os IDs de cada etapa.</div>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-num">Passo 4 — CORS (importante!)</div>
+      <div class="modal-step-text">O Kommo não permite chamadas diretas do navegador por CORS. Em produção, você vai precisar de um pequeno servidor (ex: Cloudflare Worker ou Vercel Function) que faça as chamadas pro Kommo. O portal já está pronto pra isso — basta trocar a URL da função nos campos acima. <a href="#" onclick="closeModal('modal-kommo-guide')">Fala comigo pra eu gerar o código do servidor →</a></div>
+    </div>
+    <div class="modal-btns">
+      <button class="action-btn primary" style="background:var(--blue);" onclick="closeModal('modal-kommo-guide')">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// KOMMO — WEBHOOK ENGINE
+// ═══════════════════════════════════════════════════════════
+
+function logWebhook(event, msg, type='ok') {
+  const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  webhookLog.unshift({ ts, event, msg, type });
+  if (webhookLog.length > 50) webhookLog.pop();
+  renderWebhookLog();
+}
+
+function renderWebhookLog() {
+  const el = document.getElementById('webhook-log-items');
+  if (!el) return;
+  el.innerHTML = webhookLog.length === 0
+    ? '<div class="webhook-log-item warn"><span class="webhook-log-time">--:--</span><span class="webhook-log-event">[INFO]</span><span class="webhook-log-msg">Nenhum evento ainda.</span></div>'
+    : webhookLog.map(l => `
+      <div class="webhook-log-item ${l.type}">
+        <span class="webhook-log-time">${l.ts}</span>
+        <span class="webhook-log-event">[${l.event}]</span>
+        <span class="webhook-log-msg">${l.msg}</span>
+      </div>`).join('');
+}
+
+// Chamada central pro Kommo — encapsulada pra facilitar trocar pela função servidor depois
+async function kommoAPI(method, endpoint, body) {
+  if (!KOMMO_CONFIGURED) {
+    logWebhook('SKIP', `${method} ${endpoint} — Kommo não configurado.`, 'warn');
+    return null;
+  }
+  const url = `https://${KOMMO_CONFIG.SUBDOMAIN}.kommo.com/api/v4/${endpoint}`;
+  logWebhook('→ REQ', `${method} ${endpoint}`, 'ok');
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Authorization': `Bearer ${KOMMO_CONFIG.ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    logWebhook('✓ OK', `${endpoint} → sucesso`, 'ok');
+    return data;
+  } catch (err) {
+    // CORS vai bloquear em localhost — normal. Em produção com servidor funciona.
+    logWebhook('ERR', `${endpoint}: ${err.message} (em produção use um servidor proxy)`, 'error');
+    return null;
+  }
+}
+
+// ── Criar ou atualizar lead ──────────────────────────────────
+async function kommoCreateLead(client) {
+  const stageId = KOMMO_CONFIG.STAGE_AGUARDANDO;
+  const body = [{
+    name: `${client.nome} — ${actionTemplates[client.acao]?.nome || client.acao}`,
+    pipeline_id: KOMMO_CONFIG.PIPELINE_ID || undefined,
+    status_id: stageId || undefined,
+    _embedded: {
+      contacts: [{ name: client.nome, custom_fields_values: [
+        { field_code: 'PHONE', values: [{ value: client.telefone, enum_code: 'WORK' }] }
+      ]}]
+    },
+    custom_fields_values: [
+      { field_id: 0, values: [{ value: client.id }] }, // ajuste o field_id pro campo "ID Interno"
+    ],
+  }];
+  const result = await kommoAPI('POST', 'leads/complex', body);
+  if (result) {
+    const leadId = result?.[0]?.id;
+    if (leadId) {
+      client.kommoLeadId = leadId;
+      logWebhook('LEAD', `Lead criado: ID ${leadId} para ${client.nome}`, 'ok');
+      // Salva o link do portal como nota
+      await kommoAddNote(leadId, `🔗 Link do portal: portaljuridico.com/pendencias/${client.id.toLowerCase()}-${client.nome.toLowerCase().replace(/ /g,'-')}`);
+    }
+  }
+}
+
+async function kommoUpdateStage(client, stageKey) {
+  if (!client.kommoLeadId) return;
+  const stageMap = {
+    'Aguardando envio inicial': KOMMO_CONFIG.STAGE_AGUARDANDO,
+    'Em conferência': KOMMO_CONFIG.STAGE_CONFERENCIA,
+    'Com pendência documental': KOMMO_CONFIG.STAGE_PENDENCIA,
+    'Documentação completa': KOMMO_CONFIG.STAGE_COMPLETO,
+    'Encaminhado para análise': KOMMO_CONFIG.STAGE_ANALISE,
+  };
+  const statusId = stageMap[stageKey];
+  if (!statusId) { logWebhook('SKIP', `Etapa "${stageKey}" sem ID configurado.`, 'warn'); return; }
+  await kommoAPI('PATCH', `leads/${client.kommoLeadId}`, { status_id: statusId });
+  logWebhook('STAGE', `Lead ${client.kommoLeadId} → "${stageKey}"`, 'ok');
+}
+
+async function kommoAddNote(leadId, text) {
+  await kommoAPI('POST', 'notes', [{ entity_id: leadId, note_type: 'common', params: { text } }]);
+}
+
+async function kommoAddTask(leadId, text, dueHours=24) {
+  const due = Math.floor(Date.now()/1000) + dueHours*3600;
+  await kommoAPI('POST', 'tasks', [{ entity_id: leadId, entity_type: 'leads', task_type_id: 1, text, complete_till: due }]);
+}
+
+async function kommoAddTag(leadId, tag) {
+  await kommoAPI('PATCH', `leads/${leadId}`, { _embedded: { tags: [{ name: tag }] } });
+}
+
+// ═══════════════════════════════════════════════════════════
+// HOOKS — chamados nos eventos do portal
+// ═══════════════════════════════════════════════════════════
+
+// Chamado quando novo cliente é cadastrado
+async function onClienteCreated(client) {
+  logWebhook('EVENT', `Novo cliente: ${client.nome}`, 'ok');
+  await kommoCreateLead(client);
+}
+
+// Chamado quando status muda
+async function onStatusChanged(client, newStatus) {
+  logWebhook('EVENT', `Status "${client.nome}" → "${newStatus}"`, 'ok');
+  await kommoUpdateStage(client, newStatus);
+
+  if (newStatus === 'Com pendência documental') {
+    if (client.kommoLeadId) await kommoAddTask(client.kommoLeadId, `⚠️ ${client.nome} tem pendência documental. Responsável: ${client.responsavel}.`, 24);
+  }
+  if (newStatus === 'Documentação completa') {
+    if (client.kommoLeadId) await kommoAddNote(client.kommoLeadId, `✅ Documentação de ${client.nome} conferida e completa em ${now()}.`);
+  }
+}
+
+// Chamado quando documento é enviado
+async function onDocumentoEnviado(client, docName, driveUrl) {
+  logWebhook('EVENT', `Doc "${docName}" enviado por ${client.nome}`, 'ok');
+  if (client.kommoLeadId) {
+    const nota = driveUrl
+      ? `📎 Documento recebido: ${docName}\n🔗 Drive: ${driveUrl}`
+      : `📎 Documento recebido: ${docName}`;
+    await kommoAddNote(client.kommoLeadId, nota);
+    // Se for o primeiro doc, atualiza etapa
+    if (client.enviados.length === 1) {
+      await kommoUpdateStage(client, 'Em conferência');
+    }
+  }
+}
+
+// Chamado quando caso é marcado urgente
+async function onUrgente(client) {
+  logWebhook('EVENT', `URGENTE: ${client.nome}`, 'error');
+  if (client.kommoLeadId) {
+    await kommoAddTag(client.kommoLeadId, 'URGENTE');
+    await kommoAddTask(client.kommoLeadId, `🚨 URGENTE: ${client.nome} — ${client.etapa}. Ação imediata necessária.`, 2);
+  }
+}
+
+// Chamado quando observação é adicionada
+async function onObservacaoAdicionada(client, texto) {
+  logWebhook('EVENT', `Obs. interna adicionada para ${client.nome}`, 'ok');
+  if (client.kommoLeadId) {
+    await kommoAddNote(client.kommoLeadId, `📝 Obs. interna (${now()}): ${texto}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONFIGURAÇÃO DO KOMMO PELA INTERFACE
+// ═══════════════════════════════════════════════════════════
+function saveKommoConfig() {
+  const sub = document.getElementById('kommo-subdomain').value.trim();
+  const token = document.getElementById('kommo-token').value.trim();
+  const pipeline = parseInt(document.getElementById('kommo-pipeline').value)||0;
+
+  if (!sub || !token) { showToast('Preencha o subdomínio e o token!','⚠️'); return; }
+
+  KOMMO_CONFIG.SUBDOMAIN = sub;
+  KOMMO_CONFIG.ACCESS_TOKEN = token;
+  KOMMO_CONFIG.PIPELINE_ID = pipeline;
+  KOMMO_CONFIG.STAGE_AGUARDANDO  = parseInt(document.getElementById('stage-aguardando').value)||0;
+  KOMMO_CONFIG.STAGE_CONFERENCIA = parseInt(document.getElementById('stage-conferencia').value)||0;
+  KOMMO_CONFIG.STAGE_PENDENCIA   = parseInt(document.getElementById('stage-pendencia').value)||0;
+  KOMMO_CONFIG.STAGE_COMPLETO    = parseInt(document.getElementById('stage-completo').value)||0;
+  KOMMO_CONFIG.STAGE_ANALISE     = parseInt(document.getElementById('stage-analise').value)||0;
+
+  // Atualiza pill de status
+  const pill = document.getElementById('kommo-status-pill');
+  if (pill) { pill.textContent = '✅ Configurado'; pill.className = 'kommo-pill ok'; }
+
+  showToast('Kommo configurado! Testando conexão...','🎯');
+  logWebhook('CONFIG', `Kommo configurado: ${sub}.kommo.com`, 'ok');
+
+  // Testa conexão
+  kommoAPI('GET','account',null).then(r => {
+    if (r) {
+      showToast(`Conectado: ${r.name || sub}!`,'✅');
+      logWebhook('TEST', `Conexão OK — conta: ${r.name||sub}`, 'ok');
+    }
+  });
+}
+
+function openKommoGuide() { document.getElementById('modal-kommo-guide').classList.add('open'); }
+
+// ═══════════════════════════════════════════════════════════
+// AUTH — LOGIN / LOGOUT / CONTROLE DE ACESSO
+// ═══════════════════════════════════════════════════════════
+
+function doLogin() {
+  const userInput = document.getElementById('login-user').value.trim().toLowerCase();
+  const passInput = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+
+  // Busca usuário
+  const user = USERS.find(u => u.id === userInput || u.nome.toLowerCase() === userInput);
+
+  if (!user || user.senha !== passInput) {
+    err.classList.add('show');
+    document.getElementById('login-pass').value = '';
+    btn.textContent = 'Entrar no painel';
+    btn.disabled = false;
+    // Shake animation
+    const box = document.querySelector('.login-box');
+    box.style.animation = 'none';
+    box.offsetHeight; // reflow
+    box.style.animation = 'shake 0.4s ease';
+    return;
+  }
+
+  // Login OK
+  err.classList.remove('show');
+  btn.textContent = '✅ Entrando...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    currentUser = user;
+    // Salva sessão no sessionStorage (dura enquanto o navegador estiver aberto)
+    sessionStorage.setItem('juridoc_user', JSON.stringify({ id: user.id, nome: user.nome, role: user.role, avatar: user.avatar, cor: user.cor }));
+    applySession(user);
+  }, 600);
+}
+
+function applySession(user) {
+  // Esconde login, mostra app
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-main').style.display = 'flex';
+
+  // Atualiza UI com dados do usuário
+  document.getElementById('sidebar-avatar').textContent = user.avatar;
+  document.getElementById('sidebar-avatar').style.background = user.cor;
+  document.getElementById('sidebar-nome').textContent = user.nome;
+  document.getElementById('sidebar-role').textContent = (user.role === 'admin' ? 'Admin' : 'Usuário') + ' • Sair';
+
+  document.getElementById('topbar-avatar').textContent = user.avatar;
+  document.getElementById('topbar-avatar').style.background = user.cor;
+  document.getElementById('topbar-nome').textContent = user.nome;
+  document.getElementById('topbar-role').textContent = user.role === 'admin' ? 'Administrador' : 'Usuário';
+
+  // Esconde botão "+ Novo cliente" pra não-admins
+  const btnNovo = document.getElementById('btn-novo-cliente');
+  if (btnNovo) btnNovo.style.display = user.role === 'admin' ? '' : 'none';
+
+  // Inicializa o sistema
+  renderTable();
+  updateStats();
+  updateDriveBar(false);
+}
+
+function confirmLogout() {
+  if (confirm(`Sair da conta de ${currentUser?.nome}?`)) doLogout();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('juridoc_user');
+  currentUser = null;
+  document.getElementById('app-main').style.display = 'none';
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-btn').textContent = 'Entrar no painel';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-error').classList.remove('show');
+  showToast('Sessão encerrada.', '👋');
+}
+
+
+// Shake animation para erro de login
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }`;
+document.head.appendChild(shakeStyle);
+
+// ═══════════════════════════════════════════════════════════
+// INIT — verifica sessão salva antes de mostrar login
+// ═══════════════════════════════════════════════════════════
+(function init() {
+  const saved = sessionStorage.getItem('juridoc_user');
+  if (saved) {
+    try {
+      const user = JSON.parse(saved);
+      currentUser = USERS.find(u => u.id === user.id) || null;
+      if (currentUser) { applySession(currentUser); return; }
+    } catch(e) {}
+  }
+  updateDriveBar(false);
+})();
+</script>
+</body>
+</html>
