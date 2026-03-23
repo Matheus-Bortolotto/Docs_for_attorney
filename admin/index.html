@@ -1002,10 +1002,16 @@ function acaoBadge(acao) {
   return `<span class="badge ${t.cor}">${t.nome}</span>`;
 }
 function generateLink(c, type) {
+  const BASE = 'https://docs-for-attorney.vercel.app';
   const slug = c.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-');
   const id = c.id.toLowerCase();
-  const paths = { inicial:`/iniciar/${id}-${slug}`, pendencia:`/pendencias/${id}-${slug}`, reenvio:`/reenvio/${id}-${slug}` };
-  return `portaljuridico.com${paths[type]||'/'}`;
+  // Todos os tipos levam pro portal do cliente com o ID correto
+  const paths = {
+    inicial:  `/cliente/${id}-${slug}?tipo=inicial`,
+    pendencia:`/cliente/${id}-${slug}?tipo=pendencia`,
+    reenvio:  `/cliente/${id}-${slug}?tipo=reenvio`,
+  };
+  return `${BASE}${paths[type]||'/cliente/'+id}`;
 }
 function showToast(msg, emoji='✅') {
   const t = document.getElementById('toast');

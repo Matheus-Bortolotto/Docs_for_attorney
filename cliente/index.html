@@ -193,26 +193,36 @@ const demoClients = {
 
 // ═══════════════════════════════════════════════════════════
 // LÊ CLIENTE DA URL
-// URL: /cliente/cli-1048  ou  /cliente/demo
+// URL: /cliente/cli-1048-maria-aparecida?tipo=pendencia
 // ═══════════════════════════════════════════════════════════
 function getClientFromURL() {
   const parts = window.location.pathname.split('/').filter(Boolean);
-  // parts = ['cliente', 'cli-1048-maria-aparecida'] ou ['cliente','demo']
-  const slug = parts[1] || 'demo';
-  // Tenta encontrar pelo ID (primeiros chars antes do segundo -)
-  // Ex: cli-1048-maria-aparecida → cli-1048
+  const slug  = parts[1] || 'demo';
   const idMatch = slug.match(/^(cli-\d+)/i);
-  const key = idMatch ? idMatch[1].toLowerCase() : slug.toLowerCase();
+  const key   = idMatch ? idMatch[1].toLowerCase() : slug.toLowerCase();
   return demoClients[key] || demoClients['demo'];
 }
+
+function getLinkType() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('tipo') || 'inicial';
+}
+
+const tipoLabels = {
+  inicial:   { label:'Envio inicial de documentos',  icon:'📋' },
+  pendencia: { label:'Pendência documental',          icon:'⚠️' },
+  reenvio:   { label:'Reenvio de documentos',         icon:'🔄' },
+};
 
 // ═══════════════════════════════════════════════════════════
 // ESTADO
 // ═══════════════════════════════════════════════════════════
-const client  = getClientFromURL();
-const template = actionTemplates[client.acao];
-const docState = {}; // docId → 'uploaded' | 'naotem' | 'uploading'
-let consentOk  = client.consentimento;
+const client   = getClientFromURL();
+const template  = actionTemplates[client.acao];
+const linkType  = getLinkType();
+const tipoInfo  = tipoLabels[linkType] || tipoLabels['inicial'];
+const docState  = {};
+let consentOk   = client.consentimento;
 
 function allDocs() {
   return template.documentos.flatMap(g => g.itens.map(i => ({...i, categoria:g.categoria})));
@@ -241,7 +251,11 @@ function render() {
         <span>Docs for attorney — Portal Documental</span>
       </div>
       <div class="portal-name">Olá, ${client.nome}!</div>
-      <span class="portal-action-badge">${template.nome}</span>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+        <span class="portal-action-badge">${template.nome}</span>
+        <span class="portal-action-badge" style="background:rgba(255,255,255,0.08);">${tipoInfo.icon} ${tipoInfo.label}</span>
+        <span class="portal-action-badge" style="background:rgba(255,255,255,0.05);opacity:0.6;">${client.id}</span>
+      </div>
       <div class="portal-progress">
         <div class="portal-prog-bar"><div class="portal-prog-fill" style="width:${p}%"></div></div>
         <span class="portal-prog-label">${done} de ${total} enviados</span>
