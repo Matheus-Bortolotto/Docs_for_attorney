@@ -380,6 +380,118 @@
     color: var(--text3); font-size: 13px;
   }
   .access-denied .icon { font-size: 40px; }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVO — MOBILE
+  ══════════════════════════════════════════ */
+  .hamburger {
+    display: none; background: none; border: none; cursor: pointer;
+    padding: 6px; border-radius: 8px; flex-direction: column; gap: 5px; flex-shrink: 0;
+  }
+  .hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.25s; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
+  .sidebar-overlay.open { display: block; }
+
+  @media (max-width: 768px) {
+    .app { flex-direction: column; height: 100dvh; }
+
+    /* Sidebar vira drawer */
+    .sidebar {
+      position: fixed; top: 0; left: -270px; bottom: 0;
+      width: 260px; z-index: 200;
+      transition: left 0.28s cubic-bezier(.22,1,.36,1);
+    }
+    .sidebar.open { left: 0; box-shadow: 4px 0 32px rgba(0,0,0,0.35); }
+
+    /* Topbar */
+    .hamburger { display: flex; }
+    .topbar { padding: 0 14px; gap: 8px; height: 52px; }
+    .topbar-title { font-size: 14px; }
+    .topbar-search { display: none; }
+    .topbar-btn.ghost { display: none; }
+    .topbar-btn.primary { padding: 6px 12px; font-size: 12px; }
+    .topbar-user-name, .topbar-user-role { display: none; }
+    .topbar-user { padding: 5px; }
+
+    /* Drive bar */
+    .drive-bar { padding: 6px 14px; font-size: 11px; }
+
+    /* Panel */
+    .panel-body { padding: 12px; }
+
+    /* Stats: 2 colunas */
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-value { font-size: 22px; }
+    .stat-sub { display: none; }
+
+    /* Tabela → cards */
+    .client-table thead { display: none; }
+    .client-table, .client-table tbody, .client-table tr, .client-table td { display: block; width: 100%; }
+    .client-table tr {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); margin-bottom: 10px;
+      padding: 12px 14px; box-shadow: var(--shadow);
+    }
+    .client-table tr:hover td { background: transparent; }
+    .client-table tr.selected { border-color: var(--accent); background: var(--accent-light); }
+    .client-table td { padding: 3px 0; border: none; }
+    /* Esconde colunas menos importantes */
+    .client-table td:nth-child(3),
+    .client-table td:nth-child(6),
+    .client-table td:nth-child(7) { display: none; }
+    .client-table td:last-child { margin-top: 8px; }
+    .client-table td:last-child button { width: 100%; justify-content: center; }
+
+    /* List header */
+    .list-header { flex-wrap: wrap; gap: 6px; }
+    .filter-pill { font-size: 11px; padding: 4px 10px; }
+
+    /* Detail layout */
+    .detail-layout { flex-direction: column; overflow: auto; }
+    .detail-list { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); max-height: 190px; }
+    .detail-main { padding: 12px; }
+    .detail-header { padding: 14px; }
+    .detail-header-top { flex-direction: column; gap: 8px; }
+    .detail-name { font-size: 17px; }
+    .action-btns { gap: 6px; }
+    .action-btn { padding: 7px 10px; font-size: 11px; }
+
+    /* Tabs */
+    .tab-btn { font-size: 11px; padding: 7px 5px; gap: 2px; }
+
+    /* Form */
+    .form-row { grid-template-columns: 1fr; }
+
+    /* Cards */
+    .card { padding: 14px; }
+
+    /* Modal */
+    .modal { padding: 20px 16px; width: 96vw; }
+    .modal-btns { flex-direction: column-reverse; gap: 8px; }
+    .modal-btns button { width: 100%; justify-content: center; }
+
+    /* Portal */
+    .portal-header { padding: 16px 16px 20px; }
+    .portal-body { padding: 14px; }
+    .portal-name { font-size: 18px; }
+
+    /* Funil */
+    .funil-stages { flex-wrap: wrap; }
+    .funil-stage { min-width: 28%; border-radius: 6px; margin: 2px; }
+
+    /* Webhook log */
+    .webhook-log { max-height: 140px; }
+
+    /* Login */
+    .login-box { padding: 28px 20px; }
+    .login-title { font-size: 20px; }
+  }
+
+  @media (max-width: 400px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .tab-btn { font-size: 10px; padding: 6px 3px; }
+    .action-btn { font-size: 10px; padding: 6px 8px; }
+  }
 </style>
 </head>
 <body>
@@ -470,6 +582,8 @@
 </div>
 
 <div class="app" id="app-main" style="display:none;">
+  <!-- Overlay escuro ao abrir sidebar no mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">
@@ -512,6 +626,9 @@
     </div>
 
     <div class="topbar">
+      <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
       <span class="topbar-title" id="topbar-title">Dashboard</span>
       <div class="topbar-search">
         <span>🔍</span>
@@ -1032,9 +1149,29 @@ function validateFile(file) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// SIDEBAR MOBILE — hamburguer
+// ═══════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const sidebar  = document.querySelector('.sidebar');
+  const overlay  = document.getElementById('sidebar-overlay');
+  const isOpen   = sidebar.classList.toggle('open');
+  overlay.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function closeSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ═══════════════════════════════════════════════════════════
 // NAVEGAÇÃO
 // ═══════════════════════════════════════════════════════════
 function showView(view) {
+  closeSidebar(); // fecha sidebar no mobile ao navegar
   document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
